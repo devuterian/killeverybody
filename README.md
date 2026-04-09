@@ -8,9 +8,8 @@
 
 [한국어](README.md) | [English](README.en.md) | [日本語](README.ja.md)
 
-맥에서 돌아가는 프로세스를 **SIGKILL**로 끄는 도구예요. 시스템에 꼭 필요한 건 빼고, **다 죽이기**와 **적당히 죽이기** 중에서 고를 수 있어요.
-
-이 프로젝트는 키플러님의 Windows용 **다죽여**(AllKill)에서 영감을 받았어요. 소개 페이지: [http://kippler.com/allkill/](http://kippler.com/allkill/)
+진짜야? 프로그램 입맛 맞추느라 그렇게 된거야? <br>
+키플러님의 Windows용 [다죽여](http://kippler.com/allkill/)에서 영감을 받아서 Cursor + Composer 2로 만들었어요.
 
 </div>
 
