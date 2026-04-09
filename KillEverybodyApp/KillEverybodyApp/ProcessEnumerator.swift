@@ -198,9 +198,9 @@ enum ProcessEnumerator {
         } catch {
             return []
         }
-        p.waitUntilExit()
 
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        p.waitUntilExit()
         guard let s = String(data: data, encoding: .utf8) else { return [] }
 
         var rows: [PSRow] = []

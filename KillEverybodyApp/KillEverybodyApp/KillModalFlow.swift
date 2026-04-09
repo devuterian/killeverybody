@@ -10,36 +10,23 @@ final class KillModalFlow {
     static let shared = KillModalFlow()
 
     private var settings: SettingsStore!
-    private var alertWindow: NSWindow?
+
+    private struct KillResultSummary {
+        let attemptedCount: Int
+        let failureDetails: [(pid: Int32, reason: String)]
+
+        var successCount: Int { attemptedCount - failureDetails.count }
+        var failedPIDs: [pid_t] { failureDetails.map(\.pid) }
+        var needsAdminRetry: Bool { !failureDetails.isEmpty }
+    }
 
     func attachAndStart(settings: SettingsStore) {
         self.settings = settings
         DispatchQueue.main.async { self.showMainPrompt() }
     }
 
-    private func createInvisibleWindow() -> NSWindow {
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 1, height: 1),
-            styleMask: [.borderless],
-            backing: .buffered,
-            defer: false
-        )
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.hasShadow = false
-        window.ignoresMouseEvents = false // 드래그 등을 위해 이벤트 허용
-        window.isMovableByWindowBackground = true // 배경 드래그로 이동 가능하게
-        window.level = .floating
-        window.center()
-        return window
-    }
-
     private func showMainPrompt() {
-        if alertWindow == nil {
-            alertWindow = createInvisibleWindow()
-            alertWindow?.makeKeyAndOrderFront(nil)
-        }
-        guard let window = alertWindow else { return }
+        NSApp.activate(ignoringOtherApps: true)
 
         let alert = NSAlert()
         alert.messageText = "다 죽일까요?"
@@ -55,20 +42,15 @@ final class KillModalFlow {
         let cancelBtn = alert.addButton(withTitle: "종료")
         cancelBtn.keyEquivalent = "\u{1b}" // ESC 키를 종료에 할당
 
-        alert.beginSheetModal(for: window) { [weak self] response in
-            self?.alertWindow?.orderOut(nil)
-            self?.alertWindow = nil
-
-            switch response {
-            case .alertFirstButtonReturn:
-                self?.startKill(aggressive: true)
-            case .alertSecondButtonReturn:
-                self?.startKill(aggressive: false)
-            case .alertThirdButtonReturn:
-                NSApp.terminate(nil)
-            default:
-                self?.showMainPrompt()
-            }
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            startKill(aggressive: true)
+        case .alertSecondButtonReturn:
+            startKill(aggressive: false)
+        case .alertThirdButtonReturn:
+            NSApp.terminate(nil)
+        default:
+            showMainPrompt()
         }
     }
 
@@ -86,11 +68,7 @@ final class KillModalFlow {
     }
 
     private func presentAfterEnumerate(list: [KillCandidate]) {
-        if alertWindow == nil {
-            alertWindow = createInvisibleWindow()
-            alertWindow?.makeKeyAndOrderFront(nil)
-        }
-        guard let window = alertWindow else { return }
+        NSApp.activate(ignoringOtherApps: true)
 
         if list.isEmpty {
             let alert = NSAlert()
@@ -98,64 +76,82 @@ final class KillModalFlow {
             alert.informativeText = "지금은 종료할 프로세스가 없어요."
             alert.alertStyle = .informational
             alert.addButton(withTitle: "확인")
-            alert.beginSheetModal(for: window) { [weak self] _ in
-                self?.alertWindow?.orderOut(nil)
-                self?.alertWindow = nil
-                self?.showMainPrompt()
-            }
+            _ = alert.runModal()
+            showMainPrompt()
             return
         }
 
-        let confirm = NSAlert()
-        confirm.messageText = "정말 종료할까요?"
-        confirm.informativeText = "\(list.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다."
-        confirm.alertStyle = .warning
-        confirm.addButton(withTitle: "취소")
-        
-        let execBtn = confirm.addButton(withTitle: "kill -9 실행")
-        execBtn.hasDestructiveAction = true
-
-        confirm.beginSheetModal(for: window) { [weak self] response in
-            self?.alertWindow?.orderOut(nil)
-            self?.alertWindow = nil
-
-            if response == .alertFirstButtonReturn {
-                self?.showMainPrompt()
-                return
+        let pids = list.map(\.pid)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let summary = KillResultSummary(
+                attemptedCount: pids.count,
+                failureDetails: KillExecutor.killLocally(pids: pids)
+            )
+            DispatchQueue.main.async {
+                self.showKillResult(summary: summary)
             }
+        }
+    }
 
-            let pids = list.map(\.pid)
-            DispatchQueue.global(qos: .userInitiated).async {
-                let fails = KillExecutor.killLocally(pids: pids)
+    private func showKillResult(summary: KillResultSummary) {
+        NSApp.activate(ignoringOtherApps: true)
+
+        let alert = NSAlert()
+        if summary.failureDetails.isEmpty {
+            alert.messageText = "종료 요청을 보냈어요"
+            alert.informativeText = "\(summary.attemptedCount)개 프로세스에 SIGKILL을 보냈습니다."
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "확인")
+        } else {
+            let msg = summary.failureDetails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
+            alert.messageText = "일부 프로세스가 남았어요"
+            alert.informativeText = "\(summary.successCount)개 성공, \(summary.failureDetails.count)개 실패.\n\(msg)"
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "확인")
+            if summary.needsAdminRetry {
+                let retry = alert.addButton(withTitle: "관리자 권한으로 재시도")
+                retry.hasDestructiveAction = true
+            }
+        }
+
+        let response = alert.runModal()
+        if summary.needsAdminRetry, response == .alertSecondButtonReturn {
+            retryFailedKillsWithAdmin(summary: summary)
+            return
+        }
+        showMainPrompt()
+    }
+
+    private func retryFailedKillsWithAdmin(summary: KillResultSummary) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try KillExecutor.killWithAdmin(pids: summary.failedPIDs)
                 DispatchQueue.main.async {
-                    if !fails.isEmpty {
-                        self?.showFailAlert(fails: fails)
-                    } else {
-                        self?.showMainPrompt()
-                    }
+                    self.showAdminRetryResult(error: nil, retriedCount: summary.failedPIDs.count)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.showAdminRetryResult(error: error, retriedCount: summary.failedPIDs.count)
                 }
             }
         }
     }
 
-    private func showFailAlert(fails: [(pid: Int32, reason: String)]) {
-        if alertWindow == nil {
-            alertWindow = createInvisibleWindow()
-            alertWindow?.makeKeyAndOrderFront(nil)
-        }
-        guard let window = alertWindow else { return }
+    private func showAdminRetryResult(error: Error?, retriedCount: Int) {
+        NSApp.activate(ignoringOtherApps: true)
 
-        let msg = fails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
-        let failAlert = NSAlert()
-        failAlert.messageText = "일부 실패"
-        failAlert.informativeText = msg
-        failAlert.alertStyle = .warning
-        failAlert.addButton(withTitle: "확인")
-
-        failAlert.beginSheetModal(for: window) { [weak self] _ in
-            self?.alertWindow?.orderOut(nil)
-            self?.alertWindow = nil
-            self?.showMainPrompt()
+        let alert = NSAlert()
+        if let error {
+            alert.messageText = "관리자 재시도 실패"
+            alert.informativeText = error.localizedDescription
+            alert.alertStyle = .warning
+        } else {
+            alert.messageText = "관리자 권한으로 다시 보냈어요"
+            alert.informativeText = "\(retriedCount)개 프로세스에 추가 종료 요청을 보냈습니다."
+            alert.alertStyle = .informational
         }
+        alert.addButton(withTitle: "확인")
+        _ = alert.runModal()
+        showMainPrompt()
     }
 }
