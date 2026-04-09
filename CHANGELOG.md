@@ -2,6 +2,11 @@
 
 앞으로 **바뀐 것만** 짧게 적습니다 (날짜 + 불릿).
 
+## 2.0.4
+
+- 마케팅 **2.0.4**, 빌드 **14**. 메인 「다 죽일까요?」를 **시스템 `NSAlert` 시트**로 표시(커스텀 카드 UI 제거).
+- Sparkle: `./scripts/verify-sparkle-appcast.sh`로 릴리즈 appcast의 `edSignature`·`length` 존재 여부를 빠르게 확인(CONTTRIBUTING 절차에 링크).
+
 ## 2.0.3
 
 - 마케팅 **2.0.3**, 빌드 **13**. 커밋 메시지 검사에서 `Release 2.0.x` 형 제목 허용.
