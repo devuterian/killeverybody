@@ -18,11 +18,11 @@
 ./scripts/install-hooks.sh
 ```
 
-규칙은 `scripts/check-commit-standards.sh` 와 동일합니다. 부트스트랩 예외는 스크립트 주석을 참고하세요.
+규칙은 `scripts/check-commit-standards.sh` 와 동일합니다. **에이전트용 트레일러**(`project:` / `agent:` / `role:` / `artifacts:`)를 쓰거나, **일반 OSS 스타일** 제목(예: `fix: …`, `Release v2.0.0`, `Fix typo in README`)이면 CI를 통과합니다. 부트스트랩 예외는 스크립트를 참고하세요.
 
 ## CI
 
-푸시·PR 시 커밋 트레일러 검사: [`.github/workflows/commit-standards.yml`](.github/workflows/commit-standards.yml)
+푸시·PR 시 커밋 메시지 검사: [`.github/workflows/commit-standards.yml`](.github/workflows/commit-standards.yml)
 
 ## Sparkle 릴리즈(태그 `v*`)
 

@@ -14,8 +14,9 @@ repo_root=$(cd "$(dirname "$0")/.." && pwd)
 checker="$repo_root/scripts/check-commit-standards.sh"
 
 # GitHub push 이벤트에서 최초 푸시·일부 태그 푸시는 before 가 40자 0 이라 범위가 무효다.
+# 전체 히스토리를 돌리면 과거 커밋까지 검사해 항상 실패할 수 있으므로, 팁 커밋만 검사한다.
 if [ "$base" = "0000000000000000000000000000000000000000" ]; then
-  commits=$(git -C "$repo_root" rev-list "$head")
+  commits=$head
 else
   commits=$(git -C "$repo_root" rev-list "$base..$head")
 fi
