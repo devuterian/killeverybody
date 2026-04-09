@@ -43,12 +43,17 @@ final class KillModalFlow {
 
         let alert = NSAlert()
         alert.messageText = "다 죽일까요?"
-        alert.informativeText = "강한 종료는 더 많은 앱이 대상이 될 수 있어요."
+        alert.informativeText = ""
         alert.alertStyle = .warning
         alert.icon = NSApp.applicationIconImage
-        alert.addButton(withTitle: "다죽이기")
+        
+        let killAllBtn = alert.addButton(withTitle: "다죽이기")
+        killAllBtn.hasDestructiveAction = true
+        
         alert.addButton(withTitle: "적당히 죽이기")
-        alert.addButton(withTitle: "종료")
+        
+        let cancelBtn = alert.addButton(withTitle: "종료")
+        cancelBtn.keyEquivalent = "\u{1b}" // ESC 키를 종료에 할당
 
         alert.beginSheetModal(for: window) { [weak self] response in
             self?.alertWindow?.orderOut(nil)
@@ -106,7 +111,9 @@ final class KillModalFlow {
         confirm.informativeText = "\(list.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다."
         confirm.alertStyle = .warning
         confirm.addButton(withTitle: "취소")
-        confirm.addButton(withTitle: "kill -9 실행")
+        
+        let execBtn = confirm.addButton(withTitle: "kill -9 실행")
+        execBtn.hasDestructiveAction = true
 
         confirm.beginSheetModal(for: window) { [weak self] response in
             self?.alertWindow?.orderOut(nil)
