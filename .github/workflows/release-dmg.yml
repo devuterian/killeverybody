@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build (Release, unsigned)
+      - name: Build app + CLI (Release, unsigned)
         run: |
           set -euo pipefail
           DERIVED="${RUNNER_TEMP}/DerivedData"
@@ -28,12 +28,35 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             build
+          xcodebuild \
+            -project KillEverybodyApp/KillEverybodyApp.xcodeproj \
+            -scheme KillEverybodyCLI \
+            -configuration Release \
+            -destination "generic/platform=macOS" \
+            -derivedDataPath "${DERIVED}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
           APP="${DERIVED}/Build/Products/Release/killeverybody.app"
           if [ ! -d "${APP}" ]; then
             echo "Expected app at ${APP}" >&2
             exit 1
           fi
+          CLI="${DERIVED}/Build/Products/Release/killeverybody-cli"
+          if [ ! -x "${CLI}" ]; then
+            echo "Expected CLI at ${CLI}" >&2
+            exit 1
+          fi
           echo "APP_PATH=${APP}" >> "${GITHUB_ENV}"
+          echo "CLI_PATH=${CLI}" >> "${GITHUB_ENV}"
+
+      - name: CLI dry-run (release smoke)
+        run: |
+          set -euo pipefail
+          "${CLI_PATH}" --dry-run --json | head -c 8000
+          echo
+          "${CLI_PATH}" --aggressive --dry-run --json | head -c 4000
+          echo
 
       - name: Create DMG
         run: |
