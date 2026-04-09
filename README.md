@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="KillEverybodyApp/KillEverybodyApp/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png" width="256" height="256" alt="killeverybody 앱 아이콘" />
+  <img src="KillEverybodyApp/KillEverybodyApp/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png" width="256" height="256" alt="killeverybody 앱 아이콘" style="border-radius: 22.37%;" />
 </div>
 
 <div align="center">
