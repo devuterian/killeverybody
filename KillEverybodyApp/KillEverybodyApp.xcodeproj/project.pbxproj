@@ -341,7 +341,7 @@
 				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
 				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
 				INFOPLIST_KEY_SUFeedURL = "https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "rjQxVQftmH9mvKARegstutupluP0dXvjq9F6faXKqqQ=";
+				INFOPLIST_KEY_SUPublicEDKey = "Crfcxy4gcnyhHKf1a1b8WBtvRrz9UmrQKH4qRaB4pxE=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -375,7 +375,7 @@
 				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
 				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
 				INFOPLIST_KEY_SUFeedURL = "https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "rjQxVQftmH9mvKARegstutupluP0dXvjq9F6faXKqqQ=";
+				INFOPLIST_KEY_SUPublicEDKey = "Crfcxy4gcnyhHKf1a1b8WBtvRrz9UmrQKH4qRaB4pxE=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

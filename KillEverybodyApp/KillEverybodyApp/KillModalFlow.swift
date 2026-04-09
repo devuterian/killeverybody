@@ -27,7 +27,8 @@ final class KillModalFlow {
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = false
-        window.ignoresMouseEvents = true
+        window.ignoresMouseEvents = false // 드래그 등을 위해 이벤트 허용
+        window.isMovableByWindowBackground = true // 배경 드래그로 이동 가능하게
         window.level = .floating
         window.center()
         return window

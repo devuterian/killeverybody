@@ -20,8 +20,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.regular)
+        // macOS 13 이상에서 SwiftUI Settings 씬이 기본 창으로 열리는 것을 막기 위해 accessory로 시작
+        NSApp.setActivationPolicy(.accessory)
         NSApp.activate(ignoringOtherApps: true)
+
+        // 이후 필요한 경우에만 regular로 전환할 수 있으나,
+        // 이 앱은 메인 UI가 NSAlert(모달 윈도우)이므로 굳이 regular로 전환하지 않아도 동작합니다.
+        // Dock 아이콘이 필요하다면 regular 전환 후 윈도우를 숨기는 방식이 필요합니다.
+        // 기존 코드 유지:
+        NSApp.setActivationPolicy(.regular)
+        
+        // 추가: 열려있는 설정 창(기본적으로 생성되는 윈도우) 닫기
+        for window in NSApp.windows {
+            if window.className.contains("Settings") || window.title == "설정" {
+                window.close()
+            }
+        }
 
         if let key = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String, !key.isEmpty {
             log.info("Sparkle SUPublicEDKey present (length \(key.count))")
