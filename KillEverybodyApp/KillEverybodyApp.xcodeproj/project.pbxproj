@@ -34,6 +34,7 @@
 		A1B2C3D41E2F304152637497 /* KillExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillExecutor.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637498 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637499 /* KillEverybodyApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KillEverybodyApp.entitlements; sourceTree = "<group>"; };
+		A1B2C3D41E2F304152637526 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenubarProtectionPresets.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637521 /* PolicyDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyDocument.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637525 /* KillModalFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillModalFlow.swift; sourceTree = "<group>"; };
@@ -96,6 +97,7 @@
 				A1B2C3D41E2F304152637521 /* PolicyDocument.swift */,
 				A1B2C3D41E2F304152637525 /* KillModalFlow.swift */,
 				A1B2C3D41E2F304152637498 /* Assets.xcassets */,
+				A1B2C3D41E2F304152637526 /* Info.plist */,
 				A1B2C3D41E2F304152637499 /* KillEverybodyApp.entitlements */,
 			);
 			path = KillEverybodyApp;
@@ -332,16 +334,8 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = killeverybody;
-				INFOPLIST_KEY_CFBundleIconName = AppIcon;
-				INFOPLIST_KEY_CFBundleName = killeverybody;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
-				INFOPLIST_KEY_SUFeedURL = "https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "Crfcxy4gcnyhHKf1a1b8WBtvRrz9UmrQKH4qRaB4pxE=";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = KillEverybodyApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -366,16 +360,8 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = killeverybody;
-				INFOPLIST_KEY_CFBundleIconName = AppIcon;
-				INFOPLIST_KEY_CFBundleName = killeverybody;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
-				INFOPLIST_KEY_SUFeedURL = "https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "Crfcxy4gcnyhHKf1a1b8WBtvRrz9UmrQKH4qRaB4pxE=";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = KillEverybodyApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
