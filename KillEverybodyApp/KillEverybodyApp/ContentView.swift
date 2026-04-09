@@ -12,9 +12,11 @@ struct ContentView: View {
     @EnvironmentObject private var mainWindow: MainWindowState
 
     @State private var isWorking = false
-    @State private var statusMessage: String?
     @State private var pendingCandidates: [KillCandidate] = []
     @State private var showCountConfirm = false
+    @State private var showNoTargetsAlert = false
+    @State private var showKillFailureAlert = false
+    @State private var killFailureMessage = ""
 
     @State private var newExemptID = ""
     @State private var newMenubarID = ""
@@ -26,71 +28,51 @@ struct ContentView: View {
 
     private let yellowKill = Color(red: 0.92, green: 0.74, blue: 0.12)
 
+    private var appIconImage: NSImage {
+        NSApp.applicationIconImage ?? NSImage(named: NSImage.applicationIconName) ?? NSImage()
+    }
+
     var body: some View {
-        VStack(spacing: 20) {
-            Text("다 죽일까요?")
-                .font(.title2.weight(.semibold))
-                .multilineTextAlignment(.center)
-                .padding(.top, 8)
+        ZStack {
+            Color(nsColor: .underPageBackgroundColor)
+                .ignoresSafeArea()
 
-            Text("시스템에 꼭 필요한 프로세스(denylist)는 빼요. 저장 안 한 작업은 날아갈 수 있어요.")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 20) {
+                Image(nsImage: appIconImage)
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 64, height: 64)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .shadow(color: .black.opacity(0.12), radius: 4, y: 2)
 
-            if let statusMessage {
-                Text(statusMessage)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Text("다 죽일까요?")
+                    .font(.title2.weight(.bold))
                     .multilineTextAlignment(.center)
+
+                VStack(spacing: 10) {
+                    pillActionButton(title: "다죽이기", foreground: .white, background: Color(red: 0.75, green: 0.12, blue: 0.12)) {
+                        startKill(aggressive: true)
+                    }
+                    pillActionButton(title: "적당히 죽이기", foreground: .black, background: yellowKill) {
+                        startKill(aggressive: false)
+                    }
+                    pillActionButton(title: "종료", foreground: .primary, background: Color(nsColor: .separatorColor).opacity(0.35)) {
+                        NSApplication.shared.terminate(nil)
+                    }
+                    .keyboardShortcut(.cancelAction)
+                }
+                .frame(maxWidth: 280)
             }
-
-            VStack(spacing: 10) {
-                Button {
-                    startKill(aggressive: true)
-                } label: {
-                    Text("다죽이기")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
-                .controlSize(.large)
-                .disabled(isWorking)
-
-                Text("시스템 필수만 빼고, 메뉴 막대·에이전트·설정 예외는 적용하지 않아요.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-
-                Button {
-                    startKill(aggressive: false)
-                } label: {
-                    Text("적당히 죽이기")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(yellowKill)
-                .foregroundStyle(.black)
-                .controlSize(.large)
-                .disabled(isWorking)
-
-                Text("메뉴 막대·예외 번들·LSUIElement 등 기존 보호를 유지해요.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-
-                Button("종료") {
-                    NSApplication.shared.terminate(nil)
-                }
-                .keyboardShortcut(.cancelAction)
-                .padding(.top, 4)
+            .padding(28)
+            .background {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(nsColor: .windowBackgroundColor))
+                    .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
             }
-            .frame(maxWidth: 280)
-            .padding(.bottom, 12)
+            .padding(20)
         }
         .frame(minWidth: 320, maxWidth: 400)
-        .padding(24)
         .sheet(isPresented: Binding(
             get: { mainWindow.showSettings },
             set: { mainWindow.showSettings = $0 }
@@ -128,6 +110,30 @@ struct ContentView: View {
         } message: {
             Text("지금 목록이 JSON 파일 내용으로 바뀝니다.")
         }
+        .alert("알림", isPresented: $showNoTargetsAlert) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text("지금은 종료할 프로세스가 없어요.")
+        }
+        .alert("일부 실패", isPresented: $showKillFailureAlert) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text(killFailureMessage)
+        }
+    }
+
+    @ViewBuilder
+    private func pillActionButton(title: String, foreground: Color, background: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(Capsule(style: .continuous).fill(background))
+                .foregroundStyle(foreground)
+        }
+        .buttonStyle(.plain)
+        .disabled(isWorking)
     }
 
     private var settingsSheet: some View {
@@ -205,7 +211,6 @@ struct ContentView: View {
 
     private func startKill(aggressive: Bool) {
         isWorking = true
-        statusMessage = nil
         let protected = settings.protectedBundleIDs()
         DispatchQueue.global(qos: .userInitiated).async {
             let list = ProcessEnumerator.collectUserKillCandidates(
@@ -215,7 +220,7 @@ struct ContentView: View {
             DispatchQueue.main.async {
                 isWorking = false
                 if list.isEmpty {
-                    statusMessage = "지금은 종료할 프로세스가 없어요."
+                    showNoTargetsAlert = true
                     return
                 }
                 pendingCandidates = list
@@ -230,19 +235,15 @@ struct ContentView: View {
         guard !pids.isEmpty else { return }
 
         isWorking = true
-        statusMessage = nil
 
         DispatchQueue.global(qos: .userInitiated).async {
             let fails = KillExecutor.killLocally(pids: pids)
-            let msg: String
-            if fails.isEmpty {
-                msg = "SIGKILL 전송 완료"
-            } else {
-                msg = "일부 실패: " + fails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
-            }
             DispatchQueue.main.async {
                 isWorking = false
-                statusMessage = msg
+                if !fails.isEmpty {
+                    killFailureMessage = fails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
+                    showKillFailureAlert = true
+                }
             }
         }
     }

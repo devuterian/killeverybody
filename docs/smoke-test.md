@@ -22,5 +22,8 @@ CI는 GUI 앱을 대신 눌러 주지 않으니, **릴리즈 전·큰 변경 후
 ## Sparkle
 
 - [ ] **업데이트 확인…**이 오류 없이 열리고, 빌드 산출물에 `killeverybody.app/Contents/Frameworks/Sparkle.framework`가 있습니다.
+- [ ] 같은 프레임워크 안에 `Autoupdate.app`(등 헬퍼)이 들어 있는지 확인합니다.
+- [ ] 「The updater failed to start」가 나오면 [CONTRIBUTING.md](../CONTRIBUTING.md)(Sparkle 절)의 번들·서명·로그 절차를 따릅니다. 앱은 Console에서 `subsystem` = 번들 ID, `category` = `Sparkle` 로그를 남깁니다.
+- [ ] 「Fatal updater error … EdDSA」는 피드 서명·`SUPublicEDKey`·`SPARKLE_PRIVATE_KEY` 짝이 안 맞을 때입니다. [CONTRIBUTING.md](../CONTRIBUTING.md)의 해당 소절을 따릅니다.
 
 실패한 항목은 [Issues](https://github.com/devuterian/killeverybody/issues)에 OS 버전·앱 버전과 함께 적어 주세요.

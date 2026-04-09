@@ -14,11 +14,11 @@
 
 ## Core capabilities
 
-- 메인 창: 중앙 질문 **「다 죽일까요?」**와 버튼 **다죽이기**(destructive) / **적당히 죽이기**(노란 강조) / **종료**. 실행 전 **확인 알림**(종료 개수·저장 경고).
+- 메인 창: **앱 아이콘** + 질문 **「다 죽일까요?」**만 두고 버튼 **다죽이기**(빨강) / **적당히 죽이기**(노랑) / **종료**(회색 캡슐)만 둔 카드형 패널. 부가 설명 문구는 두지 않음. 실행 전 **확인 알림**(종료 개수·저장 경고). kill 일부 실패 시에만 알림.
 - **다죽이기:** 현재 사용자 UID 프로세스 중 **denylist만** 제외(예외 번들·메뉴바 프리셋·LSUIElement 스킵 없음).
 - **적당히 죽이기:** denylist + 사용자 **예외 번들 ID** + **메뉴 막대 취급 번들** + 프리셋 + **LSUIElement** 스킵(기존 `collectUserProcesses` 보호와 동일).
 - 설정(예외·정책 JSON·프리셋): **앱 메뉴 → 설정…**(⌘,) 시트로만 연다.
-- 앱 메뉴에서 **Releases** 페이지를 열고, **Sparkle**로 주기적 업데이트 확인·DMG 기반 설치를 제공한다(피드: `releases/latest/download/appcast.xml`). `Sparkle.framework`는 앱 번들 `Contents/Frameworks`에 임베드한다.
+- 앱 메뉴에서 **Releases** 페이지를 열고, **Sparkle**로 주기적 업데이트 확인·DMG 기반 설치를 제공한다(피드: `releases/latest/download/appcast.xml`). `Sparkle.framework`는 앱 번들 `Contents/Frameworks`에 임베드한다. `AppDelegate`는 `SPUUpdaterDelegate`로 Sparkle 오류를 OSLog(`category: Sparkle`)에 남긴다.
 - 문서: 루트 [`README.md`](README.md)(한국어), [`README.en.md`](README.en.md), [`README.ja.md`](README.ja.md) 상호 링크.
 
 ## Invariants
