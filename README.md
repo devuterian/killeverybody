@@ -1,10 +1,15 @@
-# KillEverybody
-
 <div align="center">
   <img src="KillEverybodyApp/KillEverybodyApp/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png" width="256" height="256" alt="KillEverybody 앱 아이콘" />
 </div>
 
-맥에서 실행 중인 앱·프로그램을 **목록으로 보여 준 뒤**, 원하는 걸 골라 **강제로 종료**할 수 있는 도구예요. 메뉴 막대 전용 앱이나 맥 시스템에 꼭 필요한 프로세스는 **가급적 건너뜁니다.**
+<div align="center">
+  
+# killeverybody <br>
+  맥에서 실행 중인 앱·프로그램을 목록으로 보여 준 뒤, 원하는 걸 골라 강제로 종료할 수 있는 도구예요. <br>
+메뉴 막대 전용 앱이나 맥 시스템에 꼭 필요한 프로세스는 가급적 건너뜁니다.
+
+</div>
+
 
 ---
 
