@@ -1,0 +1,91 @@
+import Foundation
+
+/// 프로세스 짧은 이름(comm) 또는 실행 파일 마지막 컴포넌트(소문자)와 비교.
+enum DenyList {
+    static let names: Set<String> = [
+        "kernel_task",
+        "launchd",
+        "windowserver",
+        "loginwindow",
+        "syspolicyd",
+        "mds",
+        "mds_stores",
+        "mdworker",
+        "mdworker_shared",
+        "mdworker_se",
+        "fseventsd",
+        "diskarbitrationd",
+        "notifyd",
+        "configd",
+        "powerd",
+        "airportd",
+        "coreaudiod",
+        "securityd",
+        "opendirectoryd",
+        "logd",
+        "systemstats",
+        "syslogd",
+        "thermalmonitord",
+        "watchdogd",
+        "bluetoothd",
+        "locationd",
+        "autofsd",
+        "revisiond",
+        "backupd",
+        "containermanagerd",
+        "mDNSResponder",
+        "usereventagent",
+        "distnoted",
+        "ctkd",
+        "dasd",
+        "coreduetd",
+        "talagentd",
+        "pboard",
+        "imagent",
+        "audioclocksyncd",
+        "biomed",
+        "runningboardd",
+        "symptomsd",
+        "trustd",
+        "timed",
+        "usbd",
+        "hidd",
+        "cfprefsd",
+        "contextstored",
+        "lsd",
+        "tccd",
+        "sandboxd",
+        "iconservicesagent",
+        "coreservicesd",
+        "fontd",
+        "appleeventsd",
+        "apsd",
+        "nsurlsessiond",
+        "cloudd",
+        "bird",
+        "fileproviderd",
+        "neagent",
+        "nehelper",
+        "socketfilterfw",
+        "endpointsecurityd",
+        "sysextd",
+        "systemsoundserverd",
+        "corespeechd",
+        "accessoryupdaterd",
+        "remoted",
+        "remotepairingd",
+        "gamepolicyd",
+        "gamecontrollerd",
+        "perfpowerservices",
+        "killeverybody", // 본 앱 실행 파일명(소문자)
+    ]
+
+    static func isDenied(comm: String, path: String?) -> Bool {
+        let c = comm.lowercased()
+        if names.contains(c) { return true }
+        if let last = path.map({ URL(fileURLWithPath: $0).lastPathComponent.lowercased() }), names.contains(last) {
+            return true
+        }
+        return false
+    }
+}
