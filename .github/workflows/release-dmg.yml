@@ -58,7 +58,6 @@ jobs:
         run: |
           set -euo pipefail
           VER="${GITHUB_REF_NAME#v}"
-          README="https://github.com/${GITHUB_REPOSITORY}/blob/main/README.md"
           OUT="${GITHUB_WORKSPACE}/release-notes.md"
           TMP="${RUNNER_TEMP}/changelog-section.md"
           awk -v ver="$VER" '$0 == "## " ver { p=1; next } /^## / && p { exit } p' CHANGELOG.md > "${TMP}" || true
@@ -73,17 +72,9 @@ jobs:
             echo ""
             echo "---"
             echo ""
-            echo "맥용 **killeverybody**예요. DMG 받아서 응용 프로그램 폴더에 넣으면 돼요."
-            echo ""
             echo "**설치**"
             echo "1. \`KillEverybody-macOS.dmg\`를 받아 연 다음 \`killeverybody.app\`을 **응용 프로그램**으로 옮기면 끝이에요."
             echo "2. 처음엔 보안 창이 뜰 수 있어요. **우클릭 → 열기**로 한 번 열어 주거나, **시스템 설정 → 개인 정보 보호 및 보안**에서 허용해 주세요."
-            echo ""
-            echo "**알아 두면 좋아요**"
-            echo "- Actions에서 만든 빌드라 **개발자 서명·노타라이즈는 없을 수** 있어요. 더 믿고 쓰려면 직접 서명한 빌드를 쓰시면 돼요."
-            echo "- 이 앱은 **강제 종료(SIGKILL)** 을 써요. 쓰기 전 [README](${README})에 적힌 경고를 한 번만 읽어 주세요."
-            echo ""
-            echo "**참고** 태그 \`${GITHUB_REF_NAME}\` · 커밋 \`${GITHUB_SHA:0:7}\`"
           } > "${OUT}"
 
       - name: GitHub Release에 DMG 업로드
