@@ -4,9 +4,9 @@
 
 - **Last updated:** 2026-04-09
 - **Overall posture:** `active`
-- **Current focus:** macOS 앱 MVP 동작·문서·저장소 공개 준비
+- **Current focus:** README(사용자 톤)·`PLANS.md` 로드맵과 README 정합
 - **Highest-priority blocker:** 없음(로컬에서 Xcode 전체 설치·서명은 운영자 환경에 따름)
-- **Next operator decision needed:** GitHub 원격 저장소 이름·공개 범위(공개/비공개)
+- **Next operator decision needed:** `LICENSE` 채택 여부·(선택) Sparkle·서명 재개 시점
 - **Related decisions:** (아직 `DEC-*` 없음)
 
 ## Current State Summary
@@ -28,20 +28,20 @@
 
 ### GitHub publication
 
-- **Goal:** 원격 저장소에 푸시·README 링크
-- **Status:** `in progress`
+- **Goal:** 원격 저장소에 푸시·README·릴리즈(DMG)
+- **Status:** `done`
 - **Why this matters now:** 배포 요청
-- **Current work:** 로컬 `main` 초기 커밋 완료 → 원격 추가·`git push`는 운영자가 수행([README.md](README.md) 참고)
+- **Current work:** 공개 저장소·태그 릴리즈·CI DMG 업로드 완료([README.md](README.md), [Releases](https://github.com/devuterian/killeverybody/releases))
 - **Exit criteria:** 원격 `main`에 푸시
-- **Dependencies:** 운영자 GitHub 인증·원격 URL
+- **Dependencies:** —
 - **Risks:** 없음
 - **Related ids:** —
 
 ## Recent Changes To Project Reality
 
 - **2026-04-09**
-  - **Change:** repo-template scaffold + KillEverybody macOS 앱 추가
-  - **Why it matters:** 단일 저장소에서 제품과 운영 규율을 함께 관리
+  - **Change:** repo-template scaffold + KillEverybody macOS 앱 추가; 이후 README(토스 톤)·DMG/보안 안내 정리 및 `PLANS.md`에 서명 보류·Sparkle·LICENSE 방향 명시
+  - **Why it matters:** 단일 저장소에서 제품·규율·사용자 문서 전제를 맞춤
   - **Related ids:** `LOG-20260409-001`
 
 ## Active Blockers And Risks
@@ -54,7 +54,7 @@
 
 ## Immediate Next Steps
 
-- **Next:** GitHub에 원격 추가 후 `main` 푸시
+- **Next:** (선택) `LICENSE` 결정·추가
   - **Owner:** 운영자
-  - **Trigger:** 원격 URL 확정
+  - **Trigger:** 공개·재배포 의도 확정
   - **Related ids:** —
