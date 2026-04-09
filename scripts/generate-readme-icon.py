@@ -11,6 +11,8 @@ GitHub는 README의 <img>에서 style(border-radius 등)을 제거하므로,
 
 앱 아이콘을 바꾼 뒤: python3 scripts/generate-readme-icon.py
 의존: pip install pillow
+
+가장자리는 마스크를 고해상도로 그린 뒤 LANCZOS 축소해 부드럽게 합니다.
 """
 from __future__ import annotations
 
@@ -28,6 +30,8 @@ OUT = ROOT / "docs/readme-app-icon.png"
 CORNER_PERCENT_OF_SIDE = 45.0
 OUT_SIZE = 512
 BEZIER_STEPS = 48
+# polygon 마스크는 픽셀 격자에 딱 붙어 계단 현상이 나므로, 고해상도로 채운 뒤 축소해 안티앨리어싱
+MASK_SUPERSAMPLE = 4
 
 
 def _quad_point(which: str, x: float, y: float, w: int, h: int, r: float) -> tuple[float, float]:
@@ -146,15 +150,16 @@ def _continuous_squircle_outline(w: int, h: int, r: float) -> list[tuple[float, 
     return pts
 
 
-def _raster_mask(size: tuple[int, int]) -> Image.Image:
+def _raster_mask(size: tuple[int, int], supersample: int = MASK_SUPERSAMPLE) -> Image.Image:
     w, h = size
-    side = min(w, h)
+    w_ss, h_ss = w * supersample, h * supersample
+    side = min(w_ss, h_ss)
     r = side * (CORNER_PERCENT_OF_SIDE / 200.0)
-    outline = _continuous_squircle_outline(w, h, r)
+    outline = _continuous_squircle_outline(w_ss, h_ss, r)
     poly = [(int(round(x)), int(round(y))) for x, y in outline]
-    mask = Image.new("L", (w, h), 0)
-    ImageDraw.Draw(mask).polygon(poly, fill=255)
-    return mask
+    mask_hires = Image.new("L", (w_ss, h_ss), 0)
+    ImageDraw.Draw(mask_hires).polygon(poly, fill=255)
+    return mask_hires.resize((w, h), Image.Resampling.LANCZOS)
 
 
 def main() -> None:
