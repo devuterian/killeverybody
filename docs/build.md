@@ -32,6 +32,8 @@ xcodebuild -scheme KillEverybodyApp -configuration Debug build CODE_SIGNING_ALLO
 
 GitHub는 README 안의 `<img>`에 **CSS `style`(border-radius 등)을 적용하지 않습니다.** 상단 둥근 아이콘은 미리 마스크한 PNG(`docs/readme-app-icon.png`)를 씁니다.
 
+마스크는 **SwiftUI `RoundedRectangle(..., style: .continuous)`** 와 같은 연속 곡률 베지어(맥·iOS 앱 아이콘 크롬과 동일 계열, macOS 26 포함)입니다. 단순 `rounded_rectangle`이 아닙니다.
+
 앱 아이콘 에셋을 바꾼 뒤 아래를 한 번 실행하세요 (Pillow 필요: `pip install pillow`).
 
 ```bash
