@@ -18,7 +18,7 @@ cd KillEverybodyApp
 xcodebuild -scheme KillEverybodyApp -configuration Debug build CODE_SIGNING_ALLOWED=NO
 ```
 
-산출물 경로는 로그의 `BUILD_DIR` / DerivedData를 참고하세요.
+산출물은 `…/Build/Products/Debug/killeverybody.app` (또는 Release)입니다. 로그의 `BUILD_DIR` / DerivedData를 참고하세요.
 
 ## 타입 검사만 (Xcode 없이 시도)
 

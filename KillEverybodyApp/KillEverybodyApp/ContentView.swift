@@ -65,7 +65,7 @@ struct ContentView: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle("KillEverybody")
+            .navigationTitle("killeverybody")
             .toolbar {
                 ToolbarItem(placement: .automatic) {
                     Button {
@@ -247,7 +247,7 @@ struct ContentView: View {
             let data = try settings.exportPolicyData()
             let panel = NSSavePanel()
             panel.allowedContentTypes = [.json]
-            panel.nameFieldStringValue = "KillEverybody-policy.json"
+            panel.nameFieldStringValue = "killeverybody-policy.json"
             panel.begin { response in
                 guard response == .OK, let url = panel.url else { return }
                 do {

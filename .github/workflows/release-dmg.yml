@@ -28,7 +28,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             build
-          APP="${DERIVED}/Build/Products/Release/KillEverybody.app"
+          APP="${DERIVED}/Build/Products/Release/killeverybody.app"
           if [ ! -d "${APP}" ]; then
             echo "Expected app at ${APP}" >&2
             exit 1
@@ -46,7 +46,7 @@ jobs:
           DMG="${GITHUB_WORKSPACE}/KillEverybody-macOS.dmg"
           rm -f "${DMG}"
           hdiutil create \
-            -volname "KillEverybody" \
+            -volname "killeverybody" \
             -fs HFS+ \
             -srcfolder "${STAGING}" \
             -ov \
@@ -60,10 +60,10 @@ jobs:
           files: KillEverybody-macOS.dmg
           generate_release_notes: true
           body: |
-            ## KillEverybody for macOS
+            ## killeverybody for macOS
 
             ### 설치
-            1. `KillEverybody-macOS.dmg`를 다운로드해 연 뒤, `KillEverybody.app`을 **응용 프로그램(Applications)** 폴더로 옮깁니다.
+            1. `KillEverybody-macOS.dmg`를 다운로드해 연 뒤, `killeverybody.app`을 **응용 프로그램(Applications)** 폴더로 옮깁니다.
             2. 첫 실행 시 Gatekeeper 때문에 막히면, 앱을 **우클릭 → 열기**로 실행하거나 **시스템 설정 → 개인 정보 보호 및 보안**에서 허용합니다.
 
             ### 주의

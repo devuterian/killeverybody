@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="KillEverybodyApp/KillEverybodyApp/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png" width="256" height="256" alt="KillEverybody 앱 아이콘" />
+  <img src="KillEverybodyApp/KillEverybodyApp/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png" width="256" height="256" alt="killeverybody 앱 아이콘" />
 </div>
 
 <div align="center">
@@ -16,12 +16,12 @@
 ## 설치하기
 
 1. **[Releases에서 최신 DMG](https://github.com/devuterian/killeverybody/releases)** 를 받아요. (`KillEverybody-macOS.dmg`)
-2. DMG를 열고, **KillEverybody.app**을 **응용 프로그램** 폴더에 끌어다 놓아요.
+2. DMG를 열고, **killeverybody.app**을 **응용 프로그램** 폴더에 끌어다 놓아요.
 3. 앱을 실행하면 끝이에요.
 
 **보안 경고가 뜨면:** GitHub Actions로 자동 빌드한 앱이라 **개발자 서명·공증이 없을 수** 있어요. **우클릭 → 열기**로 한 번만 실행하거나, **시스템 설정 → 개인 정보 보호 및 보안**에서 허용해 주면 돼요.
 
-**업데이트:** 맥 메뉴 **KillEverybody → 최신 릴리즈 열기…** 로 Releases 페이지를 열 수 있어요.
+**업데이트:** 맥 메뉴 **killeverybody → 최신 릴리즈 열기…** 로 Releases 페이지를 열 수 있어요.
 
 ---
 

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A1B2C3D41E2F3041526374B0"
-               BuildableName = "KillEverybody.app"
+               BuildableName = "killeverybody.app"
                BlueprintName = "KillEverybodyApp"
                ReferencedContainer = "container:KillEverybodyApp.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1B2C3D41E2F3041526374B0"
-            BuildableName = "KillEverybody.app"
+            BuildableName = "killeverybody.app"
             BlueprintName = "KillEverybodyApp"
             ReferencedContainer = "container:KillEverybodyApp.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1B2C3D41E2F3041526374B0"
-            BuildableName = "KillEverybody.app"
+            BuildableName = "killeverybody.app"
             BlueprintName = "KillEverybodyApp"
             ReferencedContainer = "container:KillEverybodyApp.xcodeproj">
          </BuildableReference>

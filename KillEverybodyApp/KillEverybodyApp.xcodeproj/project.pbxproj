@@ -20,7 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1B2C3D41E2F304152637490 /* KillEverybody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KillEverybody.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D41E2F304152637490 /* killeverybody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = killeverybody.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D41E2F304152637491 /* KillEverybodyAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillEverybodyAppApp.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637492 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637493 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 		A1B2C3D41E2F3041526374A3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A1B2C3D41E2F304152637490 /* KillEverybody.app */,
+				A1B2C3D41E2F304152637490 /* killeverybody.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,7 +96,7 @@
 			);
 			name = KillEverybodyApp;
 			productName = KillEverybodyApp;
-			productReference = A1B2C3D41E2F304152637490 /* KillEverybody.app */;
+			productReference = A1B2C3D41E2F304152637490 /* killeverybody.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -294,6 +294,9 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = killeverybody;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				INFOPLIST_KEY_CFBundleName = killeverybody;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -302,7 +305,7 @@
 				);
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.LPFchan.KillEverybody;
-				PRODUCT_NAME = KillEverybody;
+				PRODUCT_NAME = killeverybody;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -321,6 +324,9 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = killeverybody;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				INFOPLIST_KEY_CFBundleName = killeverybody;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -329,7 +335,7 @@
 				);
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.LPFchan.KillEverybody;
-				PRODUCT_NAME = KillEverybody;
+				PRODUCT_NAME = killeverybody;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
