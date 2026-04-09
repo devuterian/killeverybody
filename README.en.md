@@ -63,3 +63,12 @@ Issues: [github.com/devuterian/killeverybody/issues](https://github.com/devuteri
 ## License
 
 [MIT License](LICENSE). Read the full text; this is a high-risk tool and the disclaimer matters.
+
+---
+
+<div align="center">
+
+The repo layout and operating docs are based on [LPFchan/repo-template](https://github.com/LPFchan/repo-template).<br>
+Thanks for open-sourcing the template.
+
+</div>
