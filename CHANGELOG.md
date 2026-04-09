@@ -2,6 +2,10 @@
 
 앞으로 **바뀐 것만** 짧게 적습니다 (날짜 + 불릿).
 
+## 2.0.3
+
+- 마케팅 **2.0.3**, 빌드 **13**. 커밋 메시지 검사에서 `Release 2.0.x` 형 제목 허용.
+
 ## 2.0.2
 
 - Sparkle **EdDSA 키 재발급**: `INFOPLIST_KEY_SUPublicEDKey` 갱신, GitHub Actions secret `SPARKLE_PRIVATE_KEY`를 짝 맞는 시드로 설정. 빌드 번호 12. (업데이트 확인 EdDSA 오류 해소용 릴리즈)
