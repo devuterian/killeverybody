@@ -2,15 +2,20 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// 메뉴에서 설정 시트를 열기 위한 상태(⌘, 포함).
+final class MainWindowState: ObservableObject {
+    @Published var showSettings = false
+}
+
 struct ContentView: View {
     @EnvironmentObject private var settings: SettingsStore
+    @EnvironmentObject private var mainWindow: MainWindowState
 
-    @State private var scope: KillScope = .guiOnly
-    @State private var candidates: [KillCandidate] = []
     @State private var isWorking = false
     @State private var statusMessage: String?
-    @State private var showKillConfirm = false
-    @State private var showSettings = false
+    @State private var pendingCandidates: [KillCandidate] = []
+    @State private var showCountConfirm = false
+
     @State private var newExemptID = ""
     @State private var newMenubarID = ""
     @State private var policyAlertTitle = ""
@@ -19,132 +24,88 @@ struct ContentView: View {
     @State private var pendingImportDoc: PolicyDocument?
     @State private var showImportConfirm = false
 
+    private let yellowKill = Color(red: 0.92, green: 0.74, blue: 0.12)
+
     var body: some View {
-        NavigationSplitView {
-            Form {
-                Section {
-                    Text(
-                        "메뉴 막대·에이전트·보호 번들(예외·직접 지정·앱에 넣어 둔 프리셋)과 시스템 denylist는 빼고, 미리본 뒤에만 강제 종료합니다."
-                    )
-                    .font(.callout)
+        VStack(spacing: 20) {
+            Text("다 죽일까요?")
+                .font(.title2.weight(.semibold))
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+
+            Text("시스템에 꼭 필요한 프로세스(denylist)는 빼요. 저장 안 한 작업은 날아갈 수 있어요.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
-                }
-
-                Section("범위") {
-                    Picker("종료 범위", selection: $scope) {
-                        ForEach(KillScope.allCases) { s in
-                            Text(s.title).tag(s)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                    Text(scope.detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Section {
-                    Button {
-                        refreshCandidates()
-                    } label: {
-                        Label("대상 수집", systemImage: "arrow.triangle.2.circlepath")
-                    }
-                    .disabled(isWorking)
-
-                    if scope.usesAdminShell {
-                        Label("관리자 모드는 암호 입력 창이 뜹니다.", systemImage: "exclamationmark.shield")
-                            .font(.caption)
-                            .foregroundStyle(.orange)
-                    }
-                }
-
-                if let statusMessage {
-                    Section {
-                        Text(statusMessage)
-                            .font(.caption)
-                    }
-                }
+                    .multilineTextAlignment(.center)
             }
-            .formStyle(.grouped)
-            .navigationTitle("killeverybody")
-            .toolbar {
-                ToolbarItem(placement: .automatic) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Label("설정", systemImage: "gearshape")
-                    }
-                }
-            }
-        } detail: {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("종료 대상 (\(candidates.count)개)")
-                        .font(.headline)
-                    Spacer()
-                    Button("강제 종료 실행") {
-                        showKillConfirm = true
-                    }
-                    .keyboardShortcut(.defaultAction)
-                    .disabled(candidates.isEmpty || isWorking)
-                }
-                .padding([.horizontal, .top])
 
-                if candidates.isEmpty {
-                    VStack(spacing: 10) {
-                        Image(systemName: "checkmark.circle")
-                            .font(.system(size: 40))
-                            .foregroundStyle(.secondary)
-                        Text("대상 없음")
-                            .font(.headline)
-                        Text("범위를 고른 뒤 「대상 수집」을 누르세요.")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                } else {
-                    Table(candidates) {
-                        TableColumn("PID") { row in
-                            Text("\(row.pid)")
-                                .monospacedDigit()
-                        }
-                        .width(min: 56, ideal: 64)
-                        TableColumn("이름") { row in
-                            Text(row.name)
-                        }
-                        .width(min: 120, ideal: 180)
-                        TableColumn("경로 / 번들") { row in
-                            VStack(alignment: .leading, spacing: 2) {
-                                if let p = row.path {
-                                    Text(p)
-                                        .font(.caption)
-                                        .lineLimit(2)
-                                        .textSelection(.enabled)
-                                }
-                                if let b = row.bundleID {
-                                    Text(b)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                        .textSelection(.enabled)
-                                }
-                            }
-                        }
-                    }
+            VStack(spacing: 10) {
+                Button {
+                    startKill(aggressive: true)
+                } label: {
+                    Text("다죽이기")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .controlSize(.large)
+                .disabled(isWorking)
+
+                Text("시스템 필수만 빼고, 메뉴 막대·에이전트·설정 예외는 적용하지 않아요.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+
+                Button {
+                    startKill(aggressive: false)
+                } label: {
+                    Text("적당히 죽이기")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(yellowKill)
+                .foregroundStyle(.black)
+                .controlSize(.large)
+                .disabled(isWorking)
+
+                Text("메뉴 막대·예외 번들·LSUIElement 등 기존 보호를 유지해요.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+
+                Button("종료") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .keyboardShortcut(.cancelAction)
+                .padding(.top, 4)
             }
+            .frame(maxWidth: 280)
+            .padding(.bottom, 12)
         }
-        .frame(minWidth: 720, minHeight: 480)
-        .sheet(isPresented: $showSettings) {
+        .frame(minWidth: 320, maxWidth: 400)
+        .padding(24)
+        .sheet(isPresented: Binding(
+            get: { mainWindow.showSettings },
+            set: { mainWindow.showSettings = $0 }
+        )) {
             settingsSheet
         }
-        .alert("정말 강제 종료할까요?", isPresented: $showKillConfirm) {
-            Button("취소", role: .cancel) {}
+        .alert("정말 종료할까요?", isPresented: $showCountConfirm) {
+            Button("취소", role: .cancel) {
+                pendingCandidates = []
+            }
             Button("kill -9 실행", role: .destructive) {
                 performKill()
             }
         } message: {
-            Text("\(candidates.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다.")
+            Text("\(pendingCandidates.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다.")
         }
         .alert(policyAlertTitle, isPresented: $showPolicyAlert) {
             Button("확인", role: .cancel) {}
@@ -235,11 +196,55 @@ struct ContentView: View {
             .navigationTitle("설정")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("닫기") { showSettings = false }
+                    Button("닫기") { mainWindow.showSettings = false }
                 }
             }
         }
         .frame(minWidth: 440, minHeight: 560)
+    }
+
+    private func startKill(aggressive: Bool) {
+        isWorking = true
+        statusMessage = nil
+        let protected = settings.protectedBundleIDs()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let list = ProcessEnumerator.collectUserKillCandidates(
+                aggressive: aggressive,
+                protectedBundleIDs: protected
+            )
+            DispatchQueue.main.async {
+                isWorking = false
+                if list.isEmpty {
+                    statusMessage = "지금은 종료할 프로세스가 없어요."
+                    return
+                }
+                pendingCandidates = list
+                showCountConfirm = true
+            }
+        }
+    }
+
+    private func performKill() {
+        let pids = pendingCandidates.map(\.pid)
+        pendingCandidates = []
+        guard !pids.isEmpty else { return }
+
+        isWorking = true
+        statusMessage = nil
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            let fails = KillExecutor.killLocally(pids: pids)
+            let msg: String
+            if fails.isEmpty {
+                msg = "SIGKILL 전송 완료"
+            } else {
+                msg = "일부 실패: " + fails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
+            }
+            DispatchQueue.main.async {
+                isWorking = false
+                statusMessage = msg
+            }
+        }
     }
 
     private func exportPolicyFile() {
@@ -290,59 +295,6 @@ struct ContentView: View {
                 policyAlertTitle = "읽기 실패"
                 policyAlertMessage = error.localizedDescription
                 showPolicyAlert = true
-            }
-        }
-    }
-
-    private func refreshCandidates() {
-        isWorking = true
-        statusMessage = nil
-        let protected = settings.protectedBundleIDs()
-        let currentScope = scope
-        DispatchQueue.global(qos: .userInitiated).async {
-            let list = ProcessEnumerator.collectCandidates(scope: currentScope, protectedBundleIDs: protected)
-            DispatchQueue.main.async {
-                candidates = list
-                isWorking = false
-                statusMessage = "수집 완료: \(list.count)개"
-            }
-        }
-    }
-
-    private func performKill() {
-        let pids = candidates.map(\.pid)
-        guard !pids.isEmpty else { return }
-        isWorking = true
-        statusMessage = nil
-
-        if scope.usesAdminShell {
-            Task { @MainActor in
-                defer {
-                    isWorking = false
-                    refreshCandidates()
-                }
-                do {
-                    try KillExecutor.killWithAdmin(pids: pids)
-                    statusMessage = "관리자 kill 완료"
-                } catch {
-                    statusMessage = error.localizedDescription
-                }
-            }
-            return
-        }
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            let fails = KillExecutor.killLocally(pids: pids)
-            let msg: String
-            if fails.isEmpty {
-                msg = "SIGKILL 전송 완료"
-            } else {
-                msg = "일부 실패: " + fails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
-            }
-            DispatchQueue.main.async {
-                isWorking = false
-                statusMessage = msg
-                refreshCandidates()
             }
         }
     }

@@ -1,15 +1,19 @@
 import AppKit
 import Sparkle
 
-/// Sparkle 업데이터(주기적 확인·다운로드). 메뉴의 「업데이트 확인…」에서 사용합니다.
+/// Sparkle 업데이터. `applicationDidFinishLaunching` 이후에 기동해 XPC/헬퍼 준비 타이밍을 맞춥니다.
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private(set) lazy var updaterController = SPUStandardUpdaterController(
-        startingUpdater: true,
-        updaterDelegate: nil,
-        userDriverDelegate: nil
-    )
+    private var updaterController: SPUStandardUpdaterController?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        updaterController = SPUStandardUpdaterController(
+            startingUpdater: true,
+            updaterDelegate: nil,
+            userDriverDelegate: nil
+        )
+    }
 
     func checkForUpdates() {
-        updaterController.checkForUpdates(nil)
+        updaterController?.checkForUpdates(nil)
     }
 }

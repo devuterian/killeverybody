@@ -2,6 +2,17 @@
 
 앞으로 **바뀐 것만** 짧게 적습니다 (날짜 + 불릿).
 
+## 2.0.0
+
+- 마케팅 버전 **2.0.0**.
+- README·SPEC에 영감 출처 명시: 키플러(kippler)의 Windows용 **다죽여**(AllKill) — [http://kippler.com/allkill/](http://kippler.com/allkill/).
+
+## 1.3.0
+
+- README 한국어·영어·일본어 분리 및 상호 링크(`README.md`, `README.en.md`, `README.ja.md`).
+- 메인 UI를 **「다 죽일까요?」** 다이얼로그로 단순화(다죽이기 / 적당히 죽이기 / 종료, 확인 알림). 설정은 메뉴 ⌘,만.
+- Sparkle: `Sparkle.framework`를 앱 번들에 Embed, 업데이터 초기화 시점 정리.
+
 ## 1.2.0
 
 - Sparkle 자동 업데이트(피드: GitHub Release `appcast.xml`, 메뉴 「업데이트 확인…」).

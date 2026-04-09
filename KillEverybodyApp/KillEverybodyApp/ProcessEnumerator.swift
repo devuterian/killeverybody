@@ -58,8 +58,19 @@ enum ProcessEnumerator {
         case .guiOnly:
             return collectGUI(protectedBundleIDs: protectedBundleIDs)
         case .userProcesses, .adminUserProcesses:
-            return collectUserProcesses(protectedBundleIDs: protectedBundleIDs)
+            return collectUserProcesses(
+                protectedBundleIDs: protectedBundleIDs,
+                respectUserAndAgentProtection: true
+            )
         }
+    }
+
+    /// 메인 창 두 모드: `aggressive`면 denylist만 제외, `moderate`면 예외·LSUIElement·메뉴바 보호 유지.
+    static func collectUserKillCandidates(aggressive: Bool, protectedBundleIDs: Set<String>) -> [KillCandidate] {
+        collectUserProcesses(
+            protectedBundleIDs: protectedBundleIDs,
+            respectUserAndAgentProtection: !aggressive
+        )
     }
 
     private static func collectGUI(protectedBundleIDs: Set<String>) -> [KillCandidate] {
@@ -108,7 +119,10 @@ enum ProcessEnumerator {
         return out
     }
 
-    private static func collectUserProcesses(protectedBundleIDs: Set<String>) -> [KillCandidate] {
+    private static func collectUserProcesses(
+        protectedBundleIDs: Set<String>,
+        respectUserAndAgentProtection: Bool
+    ) -> [KillCandidate] {
         let uid = getuid()
         var rows = parsePS()
         rows.sort { $0.pid < $1.pid }
@@ -131,11 +145,13 @@ enum ProcessEnumerator {
                    let bid = dict["CFBundleIdentifier"] as? String
                 {
                     bundleID = bid
-                    if protectedBundleIDs.contains(bid) {
-                        continue
-                    }
-                    if PlistHelpers.isLSUIElement(bundleURL: bundleRoot) {
-                        continue
+                    if respectUserAndAgentProtection {
+                        if protectedBundleIDs.contains(bid) {
+                            continue
+                        }
+                        if PlistHelpers.isLSUIElement(bundleURL: bundleRoot) {
+                            continue
+                        }
                     }
                 }
             }
