@@ -8,7 +8,7 @@
 ## Xcode에서
 
 1. 저장소를 클론합니다.
-2. `KillEverybodyApp/KillEverybodyApp.xcodeproj`를 엽니다.
+2. `KillEverybodyApp/KillEverybodyApp.xcodeproj`를 엽니다. 처음 열면 **Swift Package(Sparkle)** 를 받느라 잠시 걸릴 수 있습니다.
 3. 스킴 **KillEverybodyApp** → **Run (⌘R)**.
 
 ## 명령줄 (서명 끔)

@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1B2C3D41E2F304152637512 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D41E2F304152637530 /* Sparkle */; };
 		A1B2C3D41E2F304152637481 /* KillEverybodyAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637491 /* KillEverybodyAppApp.swift */; };
+		A1B2C3D41E2F304152637513 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637522 /* AppDelegate.swift */; };
 		A1B2C3D41E2F304152637482 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637492 /* ContentView.swift */; };
 		A1B2C3D41E2F304152637483 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637493 /* SettingsStore.swift */; };
 		A1B2C3D41E2F304152637484 /* DenyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637494 /* DenyList.swift */; };
@@ -22,6 +24,7 @@
 /* Begin PBXFileReference section */
 		A1B2C3D41E2F304152637490 /* killeverybody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = killeverybody.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D41E2F304152637491 /* KillEverybodyAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillEverybodyAppApp.swift; sourceTree = "<group>"; };
+		A1B2C3D41E2F304152637522 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637492 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637493 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637494 /* DenyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DenyList.swift; sourceTree = "<group>"; };
@@ -39,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D41E2F304152637512 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D41E2F304152637491 /* KillEverybodyAppApp.swift */,
+				A1B2C3D41E2F304152637522 /* AppDelegate.swift */,
 				A1B2C3D41E2F304152637492 /* ContentView.swift */,
 				A1B2C3D41E2F304152637493 /* SettingsStore.swift */,
 				A1B2C3D41E2F304152637494 /* DenyList.swift */,
@@ -95,6 +100,9 @@
 			dependencies = (
 			);
 			name = KillEverybodyApp;
+			packageProductDependencies = (
+				A1B2C3D41E2F304152637530 /* Sparkle */,
+			);
 			productName = KillEverybodyApp;
 			productReference = A1B2C3D41E2F304152637490 /* killeverybody.app */;
 			productType = "com.apple.product-type.application";
@@ -123,6 +131,9 @@
 				Base,
 			);
 			mainGroup = A1B2C3D41E2F3041526374A0;
+			packageReferences = (
+				A1B2C3D41E2F304152637540 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			productRefGroup = A1B2C3D41E2F3041526374A3 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -149,6 +160,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D41E2F304152637481 /* KillEverybodyAppApp.swift in Sources */,
+				A1B2C3D41E2F304152637513 /* AppDelegate.swift in Sources */,
 				A1B2C3D41E2F304152637482 /* ContentView.swift in Sources */,
 				A1B2C3D41E2F304152637483 /* SettingsStore.swift in Sources */,
 				A1B2C3D41E2F304152637484 /* DenyList.swift in Sources */,
@@ -289,7 +301,7 @@
 				CODE_SIGN_ENTITLEMENTS = KillEverybodyApp/KillEverybodyApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -299,11 +311,15 @@
 				INFOPLIST_KEY_CFBundleName = killeverybody;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
+				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
+				INFOPLIST_KEY_SUFeedURL = "https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "StBPiQgFSp+PdORFHtpKc+uNQh+VLqW3k2v/ZEYtR5g=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.LPFchan.KillEverybody;
 				PRODUCT_NAME = killeverybody;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -319,7 +335,7 @@
 				CODE_SIGN_ENTITLEMENTS = KillEverybodyApp/KillEverybodyApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -329,11 +345,15 @@
 				INFOPLIST_KEY_CFBundleName = killeverybody;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
+				INFOPLIST_KEY_SUScheduledCheckInterval = 86400;
+				INFOPLIST_KEY_SUFeedURL = "https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "StBPiQgFSp+PdORFHtpKc+uNQh+VLqW3k2v/ZEYtR5g=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.LPFchan.KillEverybody;
 				PRODUCT_NAME = killeverybody;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -363,6 +383,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1B2C3D41E2F304152637540 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1B2C3D41E2F304152637530 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D41E2F304152637540 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A1B2C3D41E2F3041526374C0 /* Project object */;
 }

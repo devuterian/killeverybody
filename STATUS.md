@@ -6,12 +6,12 @@
 - **Overall posture:** `active`
 - **Current focus:** 로드맵(서명 제외) 기능 반영 후 유지보수
 - **Highest-priority blocker:** 없음(로컬에서 Xcode 전체 설치·서명은 운영자 환경에 따름)
-- **Next operator decision needed:** (선택) Sparkle·서명 재개 시점·denylist 가져오기 필요 여부
+- **Next operator decision needed:** (선택) 서명·노타라이즈 재개 시점·denylist 가져오기 필요 여부. **Sparkle:** 릴리즈 CI에 `SPARKLE_PRIVATE_KEY` secret 필요(CONTRIBUTING 참고).
 - **Related decisions:** (아직 `DEC-*` 없음)
 
 ## Current State Summary
 
-`KillEverybodyApp/`에 SwiftUI macOS 앱이 있다. 후보 수집·denylist·LSUIElement·예외·메뉴바 프리셋·사용자 메뉴바 번들·정책 JSON 보내기/가져오기·메뉴에서 Releases 링크가 있다. MIT `LICENSE`, `CONTRIBUTING.md`, `docs/build.md`, `docs/smoke-test.md`, `scripts/smoke-check.sh`, GitHub Actions 타입체크 워크플로가 있다.
+`KillEverybodyApp/`에 SwiftUI macOS 앱이 있다. 후보 수집·denylist·LSUIElement·예외·메뉴바 프리셋·사용자 메뉴바 번들·정책 JSON 보내기/가져오기·메뉴에서 Releases 링크·**Sparkle 자동 업데이트**(업데이트 확인 메뉴·appcast)가 있다. MIT `LICENSE`, `CONTRIBUTING.md`, `docs/build.md`, `docs/smoke-test.md`, `scripts/smoke-check.sh`, GitHub Actions 타입체크 워크플로가 있다.
 
 ## Active Phases Or Tracks
 

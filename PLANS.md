@@ -34,9 +34,9 @@
 - **Outcome:** DMG 사용자가 **항상 같은 곳**(README의 [Releases](https://github.com/devuterian/killeverybody/releases) 링크, 또는 Sparkle 자동 업데이트)으로 최신 빌드를 찾게 한다.
 - **Why this is accepted:** 태그마다 URL이 바뀌지 않게 하고, 업데이트 마찰을 줄이기 위해.
 - **Expected value:** 재방문·재설치가 단순해짐.
-- **Preconditions:** 배포 채널 결정(Sparkle이면 키·호스트 정책).
+- **Preconditions:** Sparkle EdDSA 키·GitHub secret `SPARKLE_PRIVATE_KEY`·피드 URL 고정(`releases/latest/download/appcast.xml`).
 - **Earliest likely start:** 사용자 피드백 후.
-- **진행:** README 링크 + 앱 메뉴 **「최신 릴리즈 열기…」** 반영. **Sparkle 자동 업데이트**는 미도입(서명 보류와 맞물림).
+- **진행:** README 링크 + 앱 메뉴 **「최신 릴리즈 열기…」** + **Sparkle**(주기 확인·DMG 업데이트, 릴리즈마다 `appcast.xml` 동봉). 앱 Apple 서명은 여전히 선택(업데이트 무결성은 Sparkle EdDSA).
 - **Related ids:** —
 
 ### LICENSE 파일 명시

@@ -54,6 +54,60 @@ jobs:
             "${DMG}"
           ls -la "${DMG}"
 
+      - name: Sparkle appcast (서명)
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SPARKLE_PRIVATE_KEY}" ]; then
+            echo "::error::GitHub 저장소 secret \`SPARKLE_PRIVATE_KEY\`가 없습니다. CONTRIBUTING.md(Sparkle)를 참고하세요."
+            exit 1
+          fi
+          SPARKLE_DIR="${RUNNER_TEMP}/sparkle"
+          mkdir -p "${SPARKLE_DIR}"
+          curl -sL -o "${SPARKLE_DIR}/sparkle.tar.xz" \
+            "https://github.com/sparkle-project/Sparkle/releases/download/2.9.1/Sparkle-2.9.1.tar.xz"
+          tar -xJf "${SPARKLE_DIR}/sparkle.tar.xz" -C "${SPARKLE_DIR}" ./bin/sign_update
+          chmod +x "${SPARKLE_DIR}/bin/sign_update"
+          DMG="${GITHUB_WORKSPACE}/KillEverybody-macOS.dmg"
+          FRAG=$(printf '%s\n' "${SPARKLE_PRIVATE_KEY}" | "${SPARKLE_DIR}/bin/sign_update" --ed-key-file - "${DMG}" 2>&1)
+          echo "sign_update: ${FRAG}"
+          SIG=$(printf '%s' "${FRAG}" | grep -o 'edSignature="[^"]*"' | head -1 | cut -d'"' -f2)
+          LEN=$(printf '%s' "${FRAG}" | grep -o 'length="[0-9]*"' | head -1 | cut -d'"' -f2)
+          if [ -z "${SIG}" ] || [ -z "${LEN}" ]; then
+            echo "::error::sign_update 출력에서 서명 또는 length를 파싱하지 못했습니다."
+            exit 1
+          fi
+          PBX="${GITHUB_WORKSPACE}/KillEverybodyApp/KillEverybodyApp.xcodeproj/project.pbxproj"
+          SHORT=$(grep -m1 'MARKETING_VERSION = ' "${PBX}" | sed 's/.*MARKETING_VERSION = \(.*\);/\1/' | tr -d ' ')
+          BUILD=$(grep -m1 'CURRENT_PROJECT_VERSION = ' "${PBX}" | sed 's/.*CURRENT_PROJECT_VERSION = \(.*\);/\1/' | tr -d ' ')
+          TAG="${GITHUB_REF_NAME}"
+          DMG_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/KillEverybody-macOS.dmg"
+          PUBDATE=$(date -u +"%a, %d %b %Y %H:%M:%S +0000")
+          OUT="${GITHUB_WORKSPACE}/appcast.xml"
+          cat > "${OUT}" <<EOF
+          <?xml version="1.0" encoding="utf-8"?>
+          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <channel>
+              <title>killeverybody</title>
+              <link>https://github.com/${GITHUB_REPOSITORY}</link>
+              <description>Sparkle appcast</description>
+              <language>ko</language>
+              <item>
+                <title>${SHORT}</title>
+                <pubDate>${PUBDATE}</pubDate>
+                <sparkle:version>${BUILD}</sparkle:version>
+                <sparkle:shortVersionString>${SHORT}</sparkle:shortVersionString>
+                <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+                <enclosure url="${DMG_URL}" length="${LEN}" type="application/octet-stream" sparkle:edSignature="${SIG}" />
+              </item>
+            </channel>
+          </rss>
+          EOF
+          sed -i '' 's/^[[:space:]]*//' "${OUT}"
+          echo "---- appcast.xml ----"
+          cat "${OUT}"
+
       - name: 릴리즈 노트 조립 (CHANGELOG + 안내)
         run: |
           set -euo pipefail
@@ -80,7 +134,9 @@ jobs:
       - name: GitHub Release에 DMG 업로드
         uses: softprops/action-gh-release@v2
         with:
-          files: KillEverybody-macOS.dmg
+          files: |
+            KillEverybody-macOS.dmg
+            appcast.xml
           generate_release_notes: true
           body_path: release-notes.md
         env:
