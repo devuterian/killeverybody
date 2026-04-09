@@ -1,0 +1,77 @@
+name: Release DMG
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build (Release, unsigned)
+        run: |
+          set -euo pipefail
+          DERIVED="${RUNNER_TEMP}/DerivedData"
+          xcodebuild \
+            -project KillEverybodyApp/KillEverybodyApp.xcodeproj \
+            -scheme KillEverybodyApp \
+            -configuration Release \
+            -destination "generic/platform=macOS" \
+            -derivedDataPath "${DERIVED}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+          APP="${DERIVED}/Build/Products/Release/KillEverybody.app"
+          if [ ! -d "${APP}" ]; then
+            echo "Expected app at ${APP}" >&2
+            exit 1
+          fi
+          echo "APP_PATH=${APP}" >> "${GITHUB_ENV}"
+
+      - name: Create DMG
+        run: |
+          set -euo pipefail
+          STAGING="${RUNNER_TEMP}/dmg_stage"
+          rm -rf "${STAGING}"
+          mkdir -p "${STAGING}"
+          cp -R "${APP_PATH}" "${STAGING}/"
+          ln -sf /Applications "${STAGING}/Applications"
+          DMG="${GITHUB_WORKSPACE}/KillEverybody-macOS.dmg"
+          rm -f "${DMG}"
+          hdiutil create \
+            -volname "KillEverybody" \
+            -fs HFS+ \
+            -srcfolder "${STAGING}" \
+            -ov \
+            -format UDZO \
+            "${DMG}"
+          ls -la "${DMG}"
+
+      - name: GitHub Release에 DMG 업로드
+        uses: softprops/action-gh-release@v2
+        with:
+          files: KillEverybody-macOS.dmg
+          generate_release_notes: true
+          body: |
+            ## KillEverybody for macOS
+
+            ### 설치
+            1. `KillEverybody-macOS.dmg`를 다운로드해 연 뒤, `KillEverybody.app`을 **응용 프로그램(Applications)** 폴더로 옮깁니다.
+            2. 첫 실행 시 Gatekeeper 때문에 막히면, 앱을 **우클릭 → 열기**로 실행하거나 **시스템 설정 → 개인 정보 보호 및 보안**에서 허용합니다.
+
+            ### 주의
+            - CI에서 **서명·노타라이즈 없이** 빌드되었습니다. 배포 신뢰가 필요하면 Apple Developer로 서명·노타라이즈한 빌드를 별도로 만들어야 합니다.
+            - 본 앱은 **강제 종료(SIGKILL)** 를 사용합니다. 사용 전 [README.md](https://github.com/${{ github.repository }}/blob/main/README.md)의 경고를 읽으세요.
+
+            ### 소스
+            - 태그: `${{ github.ref_name }}`
+            - 커밋: `${{ github.sha }}`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
