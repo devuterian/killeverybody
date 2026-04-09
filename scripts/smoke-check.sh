@@ -21,4 +21,14 @@ xcrun swiftc -typecheck \
   KillExecutor.swift \
   MenubarProtectionPresets.swift \
   PolicyDocument.swift
+xcrun swiftc -typecheck \
+  -sdk "$SDK" \
+  -target arm64-apple-macosx13.0 \
+  ../KillEverybodyCLI/KillEverybodyCLI.swift \
+  DenyList.swift \
+  PlistHelpers.swift \
+  ProcessEnumerator.swift \
+  KillExecutor.swift \
+  MenubarProtectionPresets.swift \
+  PolicyDocument.swift
 echo "smoke-check: OK"

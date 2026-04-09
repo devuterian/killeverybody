@@ -4,6 +4,7 @@ Thumbs.db
 # Xcode
 build/
 DerivedData/
+KillEverybodyApp/ci-derived/
 *.xcuserstate
 *.xcuserdatad/
 xcuserdata/
