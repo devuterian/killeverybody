@@ -5,10 +5,14 @@ on:
     paths:
       - "KillEverybodyApp/**"
       - "scripts/smoke-check.sh"
+      - ".github/workflows/swift-smoke-check.yml"
+      - ".github/workflows/release-dmg.yml"
   pull_request:
     paths:
       - "KillEverybodyApp/**"
       - "scripts/smoke-check.sh"
+      - ".github/workflows/swift-smoke-check.yml"
+      - ".github/workflows/release-dmg.yml"
 
 jobs:
   typecheck:
