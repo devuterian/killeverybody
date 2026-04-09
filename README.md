@@ -65,3 +65,12 @@
 [MIT License](LICENSE) — 위험한 도구라는 점과 면책 조항은 라이선스 전문을 확인해 주세요.
 
 한국어 README 문장은 [토스의 8가지 라이팅 원칙](https://toss.tech/article/8-writing-principles-of-toss)을 참고해 짧게 맞췄어요.
+
+---
+
+<div align="center">
+
+저장소 운영·문서 골격은 [LPFchan/repo-template](https://github.com/LPFchan/repo-template)을 참고해 꾸렸어요.<br>
+템플릿을 공개해 주셔서 정말 고마워요.
+
+</div>
