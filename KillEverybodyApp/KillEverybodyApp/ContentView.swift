@@ -1,4 +1,6 @@
+import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @EnvironmentObject private var settings: SettingsStore
@@ -10,13 +12,19 @@ struct ContentView: View {
     @State private var showKillConfirm = false
     @State private var showSettings = false
     @State private var newExemptID = ""
+    @State private var newMenubarID = ""
+    @State private var policyAlertTitle = ""
+    @State private var policyAlertMessage = ""
+    @State private var showPolicyAlert = false
+    @State private var pendingImportDoc: PolicyDocument?
+    @State private var showImportConfirm = false
 
     var body: some View {
         NavigationSplitView {
             Form {
                 Section {
                     Text(
-                        "메뉴바·에이전트로 간주되는 앱(LSUIElement)과 시스템 denylist, 사용자 예외 번들은 종료하지 않습니다. 미리보기 후에만 실행됩니다."
+                        "메뉴 막대·에이전트·보호 번들(예외·직접 지정·앱에 넣어 둔 프리셋)과 시스템 denylist는 빼고, 미리본 뒤에만 강제 종료합니다."
                     )
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -63,7 +71,7 @@ struct ContentView: View {
                     Button {
                         showSettings = true
                     } label: {
-                        Label("예외 번들", systemImage: "gearshape")
+                        Label("설정", systemImage: "gearshape")
                     }
                 }
             }
@@ -128,7 +136,7 @@ struct ContentView: View {
         }
         .frame(minWidth: 720, minHeight: 480)
         .sheet(isPresented: $showSettings) {
-            exemptSheet
+            settingsSheet
         }
         .alert("정말 강제 종료할까요?", isPresented: $showKillConfirm) {
             Button("취소", role: .cancel) {}
@@ -138,20 +146,42 @@ struct ContentView: View {
         } message: {
             Text("\(candidates.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다.")
         }
+        .alert(policyAlertTitle, isPresented: $showPolicyAlert) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text(policyAlertMessage)
+        }
+        .alert("정책을 덮어쓸까요?", isPresented: $showImportConfirm) {
+            Button("취소", role: .cancel) {
+                pendingImportDoc = nil
+            }
+            Button("덮어쓰기", role: .destructive) {
+                if let doc = pendingImportDoc {
+                    settings.applyImportedPolicy(doc)
+                    pendingImportDoc = nil
+                    policyAlertTitle = "가져오기 완료"
+                    policyAlertMessage = "예외·메뉴 막대 번들 목록을 바꿨어요."
+                    showPolicyAlert = true
+                }
+            }
+        } message: {
+            Text("지금 목록이 JSON 파일 내용으로 바뀝니다.")
+        }
     }
 
-    private var exemptSheet: some View {
+    private var settingsSheet: some View {
         NavigationStack {
             Form {
-                Section {
+                Section("예외 번들 ID") {
+                    Text("종료 목록에 넣지 않을 앱.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     TextField("번들 ID (예: com.apple.Safari)", text: $newExemptID)
                     Button("추가") {
                         settings.addExempt(newExemptID)
                         newExemptID = ""
                     }
                     .disabled(newExemptID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-                Section("예외 목록") {
                     if settings.exemptBundleIDs.isEmpty {
                         Text("비어 있음")
                             .foregroundStyle(.secondary)
@@ -163,28 +193,114 @@ struct ContentView: View {
                             }
                             .onDelete(perform: settings.removeExempt)
                         }
-                        .frame(minHeight: 140)
+                        .frame(minHeight: 100)
+                    }
+                }
+
+                Section("메뉴 막대로 취급할 번들") {
+                    Text("LSUIElement가 아니어도 메뉴 막대 앱처럼 빼고 싶을 때.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    TextField("번들 ID", text: $newMenubarID)
+                    Button("추가") {
+                        settings.addMenubarStyle(newMenubarID)
+                        newMenubarID = ""
+                    }
+                    .disabled(newMenubarID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if settings.menubarStyleBundleIDs.isEmpty {
+                        Text("비어 있음 (앱에 넣어 둔 프리셋은 그대로 적용됨)")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        List {
+                            ForEach(settings.menubarStyleBundleIDs, id: \.self) { id in
+                                Text(id)
+                                    .textSelection(.enabled)
+                            }
+                            .onDelete(perform: settings.removeMenubarStyle)
+                        }
+                        .frame(minHeight: 100)
+                    }
+                }
+
+                Section("정책 파일 (JSON)") {
+                    Button("정책 보내기…") {
+                        exportPolicyFile()
+                    }
+                    Button("정책 가져오기…") {
+                        importPolicyFile()
                     }
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle("예외 번들 ID")
+            .navigationTitle("설정")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("닫기") { showSettings = false }
                 }
             }
         }
-        .frame(minWidth: 400, minHeight: 320)
+        .frame(minWidth: 440, minHeight: 560)
+    }
+
+    private func exportPolicyFile() {
+        do {
+            let data = try settings.exportPolicyData()
+            let panel = NSSavePanel()
+            panel.allowedContentTypes = [.json]
+            panel.nameFieldStringValue = "KillEverybody-policy.json"
+            panel.begin { response in
+                guard response == .OK, let url = panel.url else { return }
+                do {
+                    try data.write(to: url, options: .atomic)
+                    policyAlertTitle = "저장했어요"
+                    policyAlertMessage = url.path
+                    showPolicyAlert = true
+                } catch {
+                    policyAlertTitle = "저장 실패"
+                    policyAlertMessage = error.localizedDescription
+                    showPolicyAlert = true
+                }
+            }
+        } catch {
+            policyAlertTitle = "보내기 실패"
+            policyAlertMessage = error.localizedDescription
+            showPolicyAlert = true
+        }
+    }
+
+    private func importPolicyFile() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            do {
+                let data = try Data(contentsOf: url)
+                let doc = try PolicyDocument.decodeDocument(from: data)
+                if doc.formatVersion > PolicyDocument.currentFormatVersion {
+                    policyAlertTitle = "버전이 더 새 파일이에요"
+                    policyAlertMessage = "이 앱이 모르는 formatVersion입니다. 앱을 업데이트한 뒤 다시 시도해 주세요."
+                    showPolicyAlert = true
+                    return
+                }
+                pendingImportDoc = doc
+                showImportConfirm = true
+            } catch {
+                policyAlertTitle = "읽기 실패"
+                policyAlertMessage = error.localizedDescription
+                showPolicyAlert = true
+            }
+        }
     }
 
     private func refreshCandidates() {
         isWorking = true
         statusMessage = nil
-        let exempt = Set(settings.exemptBundleIDs)
+        let protected = settings.protectedBundleIDs()
         let currentScope = scope
         DispatchQueue.global(qos: .userInitiated).async {
-            let list = ProcessEnumerator.collectCandidates(scope: currentScope, exemptBundleIDs: exempt)
+            let list = ProcessEnumerator.collectCandidates(scope: currentScope, protectedBundleIDs: protected)
             DispatchQueue.main.async {
                 candidates = list
                 isWorking = false

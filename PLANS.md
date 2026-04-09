@@ -16,6 +16,7 @@
 - **Expected value:** 덜 위험한 기본 경험.
 - **Preconditions:** 실사용 로그·이슈 수집.
 - **Earliest likely start:** MVP 공개 후.
+- **진행:** 내장 **프리셋 번들** + 설정의 **메뉴 막대로 취급할 번들**이 반영됨. 머신러닝·자동 학습은 미구현.
 - **Related ids:** —
 
 ### Signed release / notarization
@@ -35,6 +36,7 @@
 - **Expected value:** 재방문·재설치가 단순해짐.
 - **Preconditions:** 배포 채널 결정(Sparkle이면 키·호스트 정책).
 - **Earliest likely start:** 사용자 피드백 후.
+- **진행:** README 링크 + 앱 메뉴 **「최신 릴리즈 열기…」** 반영. **Sparkle 자동 업데이트**는 미도입(서명 보류와 맞물림).
 - **Related ids:** —
 
 ### LICENSE 파일 명시
@@ -44,6 +46,7 @@
 - **Expected value:** 포크·재배포 기대치가 분명해짐.
 - **Preconditions:** 운영자의 라이선스 선택.
 - **Earliest likely start:** 공개 범위를 정할 때.
+- **진행:** 루트 [LICENSE](LICENSE)(MIT) 추가·README 반영 완료.
 - **Related ids:** —
 
 ## Sequencing
@@ -56,15 +59,17 @@
   - **Related ids:** `LOG-20260409-001`
 
 - **Initiative:** `LICENSE` 추가 여부 결정 및 README 라이선스 문단과 정합
-  - **Why now:** README에 이미 권장 문구가 있음; 저장소 공개 의도를 고정할 시점.
-  - **Dependencies:** 운영자 결정.
+  - **Status:** 완료(MIT).
+  - **Related ids:** —
+
+- **Initiative:** `scripts/smoke-check.sh` + [`docs/smoke-test.md`](docs/smoke-test.md)로 타입검사·수동 체크 경로 제공
+  - **Status:** 반영됨.
   - **Related ids:** —
 
 ### Mid Term
 
 - **Initiative:** denylist·예외 목록을 파일 또는 설정 UI로보내기/가져오기
-  - **Why later:** 팀·여러 머신에서 동일 정책 재사용.
-  - **Dependencies:** 제품 사용 피드백.
+  - **Status:** 예외·메뉴바 번들은 **정책 JSON**으로 보내기/가져오기 구현. **denylist 자체** 편집·가져오기는 미구현.
   - **Related ids:** —
 
 - **Initiative:** Sparkle 등 자동 업데이트 또는 릴리즈 안내 고정화(위 Approved Directions 참고)

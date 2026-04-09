@@ -15,6 +15,8 @@
 		A1B2C3D41E2F304152637486 /* ProcessEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637496 /* ProcessEnumerator.swift */; };
 		A1B2C3D41E2F304152637487 /* KillExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637497 /* KillExecutor.swift */; };
 		A1B2C3D41E2F304152637488 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637498 /* Assets.xcassets */; };
+		A1B2C3D41E2F304152637510 /* MenubarProtectionPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */; };
+		A1B2C3D41E2F304152637511 /* PolicyDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637521 /* PolicyDocument.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		A1B2C3D41E2F304152637497 /* KillExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillExecutor.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637498 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637499 /* KillEverybodyApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KillEverybodyApp.entitlements; sourceTree = "<group>"; };
+		A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenubarProtectionPresets.swift; sourceTree = "<group>"; };
+		A1B2C3D41E2F304152637521 /* PolicyDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyDocument.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +63,8 @@
 				A1B2C3D41E2F304152637495 /* PlistHelpers.swift */,
 				A1B2C3D41E2F304152637496 /* ProcessEnumerator.swift */,
 				A1B2C3D41E2F304152637497 /* KillExecutor.swift */,
+				A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */,
+				A1B2C3D41E2F304152637521 /* PolicyDocument.swift */,
 				A1B2C3D41E2F304152637498 /* Assets.xcassets */,
 				A1B2C3D41E2F304152637499 /* KillEverybodyApp.entitlements */,
 			);
@@ -149,6 +155,8 @@
 				A1B2C3D41E2F304152637485 /* PlistHelpers.swift in Sources */,
 				A1B2C3D41E2F304152637486 /* ProcessEnumerator.swift in Sources */,
 				A1B2C3D41E2F304152637487 /* KillExecutor.swift in Sources */,
+				A1B2C3D41E2F304152637510 /* MenubarProtectionPresets.swift in Sources */,
+				A1B2C3D41E2F304152637511 /* PolicyDocument.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

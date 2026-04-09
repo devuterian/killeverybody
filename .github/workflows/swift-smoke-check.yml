@@ -1,0 +1,19 @@
+name: Swift smoke check
+
+on:
+  push:
+    paths:
+      - "KillEverybodyApp/**"
+      - "scripts/smoke-check.sh"
+  pull_request:
+    paths:
+      - "KillEverybodyApp/**"
+      - "scripts/smoke-check.sh"
+
+jobs:
+  typecheck:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Typecheck app sources
+        run: ./scripts/smoke-check.sh

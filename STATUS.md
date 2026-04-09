@@ -4,14 +4,14 @@
 
 - **Last updated:** 2026-04-09
 - **Overall posture:** `active`
-- **Current focus:** README(사용자 톤)·`PLANS.md` 로드맵과 README 정합
+- **Current focus:** 로드맵(서명 제외) 기능 반영 후 유지보수
 - **Highest-priority blocker:** 없음(로컬에서 Xcode 전체 설치·서명은 운영자 환경에 따름)
-- **Next operator decision needed:** `LICENSE` 채택 여부·(선택) Sparkle·서명 재개 시점
+- **Next operator decision needed:** (선택) Sparkle·서명 재개 시점·denylist 가져오기 필요 여부
 - **Related decisions:** (아직 `DEC-*` 없음)
 
 ## Current State Summary
 
-`KillEverybodyApp/`에 SwiftUI macOS 앱이 있다. `NSWorkspace`·`/bin/ps`·`proc_pidpath`로 후보를 모으고, denylist·LSUIElement·예외 번들로 필터한 뒤 테이블에 표시한다. 관리자 모드는 `NSAppleScript`로 `kill -9`를 실행한다. repo-template 산출물(`REPO.md`, `skills/`, 커밋 검사 스크립트 등)이 루트에 있다.
+`KillEverybodyApp/`에 SwiftUI macOS 앱이 있다. 후보 수집·denylist·LSUIElement·예외·메뉴바 프리셋·사용자 메뉴바 번들·정책 JSON 보내기/가져오기·메뉴에서 Releases 링크가 있다. MIT `LICENSE`, `CONTRIBUTING.md`, `docs/build.md`, `docs/smoke-test.md`, `scripts/smoke-check.sh`, GitHub Actions 타입체크 워크플로가 있다.
 
 ## Active Phases Or Tracks
 
@@ -40,8 +40,8 @@
 ## Recent Changes To Project Reality
 
 - **2026-04-09**
-  - **Change:** repo-template scaffold + KillEverybody macOS 앱 추가; 이후 README(토스 톤)·DMG/보안 안내 정리 및 `PLANS.md`에 서명 보류·Sparkle·LICENSE 방향 명시
-  - **Why it matters:** 단일 저장소에서 제품·규율·사용자 문서 전제를 맞춤
+  - **Change:** repo-template scaffold + KillEverybody macOS 앱 추가; README(토스 톤)·DMG/보안·`PLANS` 정합; 로드맵(서명 제외) 구현 — denylist 보강, 메뉴바 프리셋·사용자 메뉴바 번들, 정책 JSON, Releases 메뉴, MIT·CONTRIBUTING·docs·스모크 스크립트·CI 타입체크
+  - **Why it matters:** 단일 저장소에서 제품·규율·사용자 문서·배포 경로를 맞춤
   - **Related ids:** `LOG-20260409-001`
 
 ## Active Blockers And Risks

@@ -20,9 +20,9 @@ enum KillScope: String, CaseIterable, Identifiable {
     var detail: String {
         switch self {
         case .guiOnly:
-            return "실행 중인 앱(NSWorkspace)만 대상으로 합니다. 시스템 필수·에이전트·메뉴바 성격(LSUIElement) 앱은 제외합니다."
+            return "실행 중인 앱만 대상으로 합니다. 시스템 필수·에이전트·메뉴 막대 쪽(설정·프리셋·LSUIElement)은 제외합니다."
         case .userProcesses:
-            return "현재 로그인 사용자 UID와 같은 프로세스를 대상으로 합니다. 시스템 denylist·에이전트·예외 번들은 제외합니다."
+            return "현재 로그인 사용자 UID와 같은 프로세스를 대상으로 합니다. denylist·에이전트·보호 번들은 제외합니다."
         case .adminUserProcesses:
             return "대상 목록은 「현재 사용자 프로세스 전체」와 동일합니다. kill에 관리자 암호를 사용합니다. 비권장·실험용입니다."
         }
@@ -53,16 +53,16 @@ enum ProcessEnumerator {
     private static let ownPID = getpid()
     private static var ownBundleID: String? { Bundle.main.bundleIdentifier }
 
-    static func collectCandidates(scope: KillScope, exemptBundleIDs: Set<String>) -> [KillCandidate] {
+    static func collectCandidates(scope: KillScope, protectedBundleIDs: Set<String>) -> [KillCandidate] {
         switch scope {
         case .guiOnly:
-            return collectGUI(exemptBundleIDs: exemptBundleIDs)
+            return collectGUI(protectedBundleIDs: protectedBundleIDs)
         case .userProcesses, .adminUserProcesses:
-            return collectUserProcesses(exemptBundleIDs: exemptBundleIDs)
+            return collectUserProcesses(protectedBundleIDs: protectedBundleIDs)
         }
     }
 
-    private static func collectGUI(exemptBundleIDs: Set<String>) -> [KillCandidate] {
+    private static func collectGUI(protectedBundleIDs: Set<String>) -> [KillCandidate] {
         var out: [KillCandidate] = []
         let apps = NSWorkspace.shared.runningApplications
 
@@ -71,7 +71,7 @@ enum ProcessEnumerator {
             let pid = app.processIdentifier
             if pid == ownPID { continue }
             if let bid = app.bundleIdentifier, bid == ownBundleID { continue }
-            if let bid = app.bundleIdentifier, exemptBundleIDs.contains(bid) {
+            if let bid = app.bundleIdentifier, protectedBundleIDs.contains(bid) {
                 continue
             }
 
@@ -108,7 +108,7 @@ enum ProcessEnumerator {
         return out
     }
 
-    private static func collectUserProcesses(exemptBundleIDs: Set<String>) -> [KillCandidate] {
+    private static func collectUserProcesses(protectedBundleIDs: Set<String>) -> [KillCandidate] {
         let uid = getuid()
         var rows = parsePS()
         rows.sort { $0.pid < $1.pid }
@@ -131,7 +131,7 @@ enum ProcessEnumerator {
                    let bid = dict["CFBundleIdentifier"] as? String
                 {
                     bundleID = bid
-                    if exemptBundleIDs.contains(bid) {
+                    if protectedBundleIDs.contains(bid) {
                         continue
                     }
                     if PlistHelpers.isLSUIElement(bundleURL: bundleRoot) {

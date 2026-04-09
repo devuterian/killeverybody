@@ -8,6 +8,7 @@ It should enforce repo behavior while deferring canonical policy details to `REP
 ## Read First
 
 - macOS 앱 소스·Xcode 프로젝트: [`KillEverybodyApp/`](KillEverybodyApp/)
+- 기여·빌드: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`docs/build.md`](docs/build.md)
 - `REPO.md`
 - `SPEC.md`
 - `STATUS.md`
