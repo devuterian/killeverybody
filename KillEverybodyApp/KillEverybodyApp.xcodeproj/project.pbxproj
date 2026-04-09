@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		A1B2C3D41E2F304152637512 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D41E2F304152637530 /* Sparkle */; };
-		A1B2C3D41E2F304152637514 /* Sparkle in Embed Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D41E2F304152637530 /* Sparkle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A1B2C3D41E2F304152637481 /* KillEverybodyAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637491 /* KillEverybodyAppApp.swift */; };
 		A1B2C3D41E2F304152637513 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637522 /* AppDelegate.swift */; };
 		A1B2C3D41E2F304152637482 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637492 /* ContentView.swift */; };
@@ -49,19 +48,27 @@
 		};
 /* End PBXFrameworksBuildPhase section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		A1B2C3D41E2F3041526374B3 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
+/* Begin PBXShellScriptBuildPhase section */
+		A1B2C3D41E2F3041526374B4 /* Embed Sparkle.framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
 			files = (
-				A1B2C3D41E2F304152637514 /* Sparkle in Embed Frameworks */,
 			);
-			name = "Embed Frameworks";
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Sparkle.framework";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/../scripts/embed-sparkle-framework.sh\"\n";
 		};
-/* End PBXCopyFilesBuildPhase section */
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXGroup section */
 		A1B2C3D41E2F3041526374A0 = {
@@ -108,7 +115,7 @@
 			buildPhases = (
 				A1B2C3D41E2F3041526374B1 /* Sources */,
 				A1B2C3D41E2F3041526374A2 /* Frameworks */,
-				A1B2C3D41E2F3041526374B3 /* Embed Frameworks */,
+				A1B2C3D41E2F3041526374B4 /* Embed Sparkle.framework */,
 				A1B2C3D41E2F3041526374B2 /* Resources */,
 			);
 			buildRules = (
@@ -317,7 +324,7 @@
 				CODE_SIGN_ENTITLEMENTS = KillEverybodyApp/KillEverybodyApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -351,7 +358,7 @@
 				CODE_SIGN_ENTITLEMENTS = KillEverybodyApp/KillEverybodyApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;

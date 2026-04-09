@@ -15,5 +15,14 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - name: Typecheck app sources
-        run: ./scripts/smoke-check.sh
+      - name: Build (Debug, unsigned, full SPM + embed)
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project KillEverybodyApp/KillEverybodyApp.xcodeproj \
+            -scheme KillEverybodyApp \
+            -configuration Debug \
+            -destination "platform=macOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
