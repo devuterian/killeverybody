@@ -5,10 +5,11 @@
 <div align="center">
 
 # killeverybody <br>
-
-[한국어](README.md) | [English](README.en.md) | [日本語](README.ja.md)
-
 진짜야? 프로그램 입맛 맞추느라 그렇게 된거야? <br>
+<br>
+[한국어](README.md) | [English](README.en.md) | [日本語](README.ja.md)
+<br>
+<br>
 키플러님의 Windows용 [다죽여](http://kippler.com/allkill/)에서 영감을 받아서 Cursor + Composer 2로 만들었어요.
 
 </div>
