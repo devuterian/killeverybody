@@ -115,8 +115,8 @@
 			buildPhases = (
 				A1B2C3D41E2F3041526374B1 /* Sources */,
 				A1B2C3D41E2F3041526374A2 /* Frameworks */,
-				A1B2C3D41E2F3041526374B2 /* Resources */,
 				A1B2C3D41E2F3041526374B4 /* Embed Sparkle.framework */,
+				A1B2C3D41E2F3041526374B2 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -324,7 +324,7 @@
 				CODE_SIGN_ENTITLEMENTS = KillEverybodyApp/KillEverybodyApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -358,7 +358,7 @@
 				CODE_SIGN_ENTITLEMENTS = KillEverybodyApp/KillEverybodyApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;

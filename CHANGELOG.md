@@ -6,7 +6,7 @@
 
 - 마케팅 버전 **2.0.0**.
 - README·SPEC에 영감 출처 명시: 키플러(kippler)의 Windows용 **다죽여**(AllKill) — [http://kippler.com/allkill/](http://kippler.com/allkill/).
-- CI/Release: SPM `Sparkle.framework` 임베드는 `scripts/embed-sparkle-framework.sh` 빌드 페이즈로 처리; Xcode 사용자 스크립트 샌드박스 비활성화로 CI에서 경로 접근 가능. 스크립트 `outputPaths`는 SPM과 중복되어 제거. 빌드 번호 9.
+- CI/Release: SPM `Sparkle.framework` 임베드 스크립트 — `BUILD_DIR` find 보강, 앱 번들 존재 확인, 빌드 페이즈를 링크 직후(Resources 앞)로 이동. 빌드 번호 10.
 
 ## 1.3.0
 
