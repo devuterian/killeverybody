@@ -3,7 +3,7 @@
 ## Project
 
 - **Project:** KillEverybody
-- **Canonical repo:** (GitHub 원격은 운영자가 연결)
+- **Canonical repo:** [github.com/devuterian/killeverybody](https://github.com/devuterian/killeverybody)
 - **Project id:** `killeverybody`
 - **Primary surface:** macOS SwiftUI 앱 — [`KillEverybodyApp/`](KillEverybodyApp/)
 - **Last updated:** 2026-04-09

@@ -2,6 +2,11 @@
 
 macOS에서 **메뉴바·에이전트 성격의 앱(주로 `LSUIElement`)과 시스템 필수 프로세스는 건너뛰고**, 선택한 범위 안의 나머지 프로세스를 **미리본 뒤 `kill -9`(SIGKILL)로 강제 종료**하는 SwiftUI **창 앱**입니다.
 
+## 공개 저장소·바이너리
+
+- **GitHub(소스):** [github.com/devuterian/killeverybody](https://github.com/devuterian/killeverybody)
+- **릴리즈·DMG:** [Releases — v1.0.0](https://github.com/devuterian/killeverybody/releases/tag/v1.0.0)에서 **`KillEverybody-macOS.dmg`** 를 받을 수 있습니다. (GitHub Actions에서 서명 없이 빌드됩니다.)
+
 이 저장소는 [LPFchan/repo-template](https://github.com/LPFchan/repo-template)의 scaffold(문서·스킬·선택적 커밋 검사)를 베이스로 포함합니다. 제품 동작의 요약은 [`SPEC.md`](SPEC.md)를 보세요.
 
 ## 경고(필독)
@@ -53,20 +58,9 @@ xcodebuild -scheme KillEverybodyApp -configuration Debug build CODE_SIGNING_ALLO
 
 푸시 시 동일 규칙을 CI로 돌리려면 [`.github/workflows/commit-standards.yml`](.github/workflows/commit-standards.yml)가 있습니다. 부트스트랩 예외는 [scripts/check-commit-standards.sh](scripts/check-commit-standards.sh) 주석을 참고하세요.
 
-## GitHub에 올리기
+## 포크·미러에 올리기
 
-로컬에서 처음 올리는 경우 예시:
-
-```bash
-git init
-git add .
-git commit -m "Bootstrap: KillEverybody 초기 가져오기"   # 훅 사용 시 트레일러/예외 규칙 준수
-git branch -M main
-git remote add origin https://github.com/<계정>/<저장소>.git
-git push -u origin main
-```
-
-원격 URL은 본인 계정·저장소 이름에 맞게 바꿉니다.
+다른 계정으로 미러하려면 원격 URL만 바꿔 푸시하면 됩니다. (이미 공개 저장소가 있으면 위 Releases 링크를 쓰면 됩니다.)
 
 ## 라이선스
 
