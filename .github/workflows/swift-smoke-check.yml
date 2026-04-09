@@ -15,14 +15,33 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - name: Build (Debug, unsigned, full SPM + embed)
+      - name: Build app + CLI (Debug, unsigned, full SPM + embed)
         run: |
           set -euo pipefail
+          DERIVED="$GITHUB_WORKSPACE/KillEverybodyApp/ci-derived"
+          rm -rf "$DERIVED"
           xcodebuild \
             -project KillEverybodyApp/KillEverybodyApp.xcodeproj \
             -scheme KillEverybodyApp \
             -configuration Debug \
             -destination "platform=macOS" \
+            -derivedDataPath "$DERIVED" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             build
+          xcodebuild \
+            -project KillEverybodyApp/KillEverybodyApp.xcodeproj \
+            -scheme KillEverybodyCLI \
+            -configuration Debug \
+            -destination "platform=macOS" \
+            -derivedDataPath "$DERIVED" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+      - name: CLI dry-run (headless enumeration smoke)
+        run: |
+          set -euo pipefail
+          CLI="$GITHUB_WORKSPACE/KillEverybodyApp/ci-derived/Build/Products/Debug/killeverybody-cli"
+          test -x "$CLI"
+          "$CLI" --dry-run --json | head -c 4000
+          echo

@@ -20,6 +20,28 @@ xcodebuild -scheme KillEverybodyApp -configuration Debug build CODE_SIGNING_ALLO
 
 산출물은 `…/Build/Products/Debug/killeverybody.app` (또는 Release)입니다. 로그의 `BUILD_DIR` / DerivedData를 참고하세요.
 
+## CLI (`killeverybody-cli`)
+
+GUI 없이 **같은 후보 수집 로직**을 터미널에서 돌릴 수 있습니다. 소스는 `KillEverybodyApp/KillEverybodyCLI/`이고, Xcode 스킴 **KillEverybodyCLI**로 빌드하면 `killeverybody-cli` 실행 파일이 나옵니다.
+
+```bash
+cd KillEverybodyApp
+xcodebuild -scheme KillEverybodyCLI -configuration Debug build CODE_SIGNING_ALLOWED=NO
+# DerivedData 기본 경로에서 Products/Debug/killeverybody-cli 를 찾거나, -derivedDataPath 로 고정하세요.
+```
+
+**기본은 `--dry-run`**: 후보만 출력하고 `SIGKILL`은 보내지 않습니다. 실제 종료는 `--execute --yes`가 필요합니다.
+
+```bash
+/path/to/killeverybody-cli --dry-run
+/path/to/killeverybody-cli --dry-run --json
+/path/to/killeverybody-cli --aggressive --dry-run
+# 앱에서보낸 정책 JSON과 동일한 예외·메뉴바 번들 병합:
+/path/to/killeverybody-cli --policy ./policy.json --dry-run
+```
+
+`--help`에 전체 옵션이 있습니다.
+
 ## 타입 검사만 (Xcode 없이 시도)
 
 ```bash

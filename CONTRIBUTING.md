@@ -3,6 +3,7 @@
 ## 저장소 구조
 
 - 앱 소스: `KillEverybodyApp/KillEverybodyApp/`
+- 헤드리스 CLI: `KillEverybodyApp/KillEverybodyCLI/` (`killeverybody-cli`, [`docs/build.md`](docs/build.md))
 - 제품·운영 문서: `SPEC.md`, `STATUS.md`, `PLANS.md`, `REPO.md`
 - 이 저장소는 [LPFchan/repo-template](https://github.com/LPFchan/repo-template) 스캐폴드를 포함합니다.
 

@@ -50,37 +50,46 @@ struct KillCandidate: Identifiable, Hashable {
 }
 
 enum ProcessEnumerator {
-    private static let ownPID = getpid()
     private static var ownBundleID: String? { Bundle.main.bundleIdentifier }
 
-    static func collectCandidates(scope: KillScope, protectedBundleIDs: Set<String>) -> [KillCandidate] {
+    static func collectCandidates(
+        scope: KillScope,
+        protectedBundleIDs: Set<String>,
+        excludingPID: pid_t = getpid()
+    ) -> [KillCandidate] {
         switch scope {
         case .guiOnly:
-            return collectGUI(protectedBundleIDs: protectedBundleIDs)
+            return collectGUI(protectedBundleIDs: protectedBundleIDs, excludingPID: excludingPID)
         case .userProcesses, .adminUserProcesses:
             return collectUserProcesses(
                 protectedBundleIDs: protectedBundleIDs,
-                respectUserAndAgentProtection: true
+                respectUserAndAgentProtection: true,
+                excludingPID: excludingPID
             )
         }
     }
 
     /// 메인 창 두 모드: `aggressive`면 denylist만 제외, `moderate`면 예외·LSUIElement·메뉴바 보호 유지.
-    static func collectUserKillCandidates(aggressive: Bool, protectedBundleIDs: Set<String>) -> [KillCandidate] {
+    static func collectUserKillCandidates(
+        aggressive: Bool,
+        protectedBundleIDs: Set<String>,
+        excludingPID: pid_t = getpid()
+    ) -> [KillCandidate] {
         collectUserProcesses(
             protectedBundleIDs: protectedBundleIDs,
-            respectUserAndAgentProtection: !aggressive
+            respectUserAndAgentProtection: !aggressive,
+            excludingPID: excludingPID
         )
     }
 
-    private static func collectGUI(protectedBundleIDs: Set<String>) -> [KillCandidate] {
+    private static func collectGUI(protectedBundleIDs: Set<String>, excludingPID: pid_t) -> [KillCandidate] {
         var out: [KillCandidate] = []
         let apps = NSWorkspace.shared.runningApplications
 
         for app in apps {
             if app.isTerminated { continue }
             let pid = app.processIdentifier
-            if pid == ownPID { continue }
+            if pid == excludingPID { continue }
             if let bid = app.bundleIdentifier, bid == ownBundleID { continue }
             if let bid = app.bundleIdentifier, protectedBundleIDs.contains(bid) {
                 continue
@@ -121,7 +130,8 @@ enum ProcessEnumerator {
 
     private static func collectUserProcesses(
         protectedBundleIDs: Set<String>,
-        respectUserAndAgentProtection: Bool
+        respectUserAndAgentProtection: Bool,
+        excludingPID: pid_t
     ) -> [KillCandidate] {
         let uid = getuid()
         var rows = parsePS()
@@ -129,7 +139,7 @@ enum ProcessEnumerator {
 
         var out: [KillCandidate] = []
         for row in rows {
-            if row.pid == ownPID { continue }
+            if row.pid == excludingPID { continue }
             if row.uid != uid { continue }
 
             let path = ProcPath.path(for: row.pid) ?? ""

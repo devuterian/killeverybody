@@ -20,6 +20,13 @@
 		A1B2C3D41E2F304152637510 /* MenubarProtectionPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */; };
 		A1B2C3D41E2F304152637511 /* PolicyDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637521 /* PolicyDocument.swift */; };
 		A1B2C3D41E2F304152637514 /* KillModalFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637525 /* KillModalFlow.swift */; };
+		B2C3D4E51F304152637601 /* DenyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637494 /* DenyList.swift */; };
+		B2C3D4E51F304152637602 /* PlistHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637495 /* PlistHelpers.swift */; };
+		B2C3D4E51F304152637603 /* ProcessEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637496 /* ProcessEnumerator.swift */; };
+		B2C3D4E51F304152637604 /* KillExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637497 /* KillExecutor.swift */; };
+		B2C3D4E51F304152637605 /* MenubarProtectionPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */; };
+		B2C3D4E51F304152637606 /* PolicyDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637521 /* PolicyDocument.swift */; };
+		B2C3D4E51F304152637607 /* KillEverybodyCLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E51F304152637551 /* KillEverybodyCLI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +45,8 @@
 		A1B2C3D41E2F304152637520 /* MenubarProtectionPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenubarProtectionPresets.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637521 /* PolicyDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyDocument.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637525 /* KillModalFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillModalFlow.swift; sourceTree = "<group>"; };
+		B2C3D4E51F304152637551 /* KillEverybodyCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillEverybodyCLI.swift; sourceTree = "<group>"; };
+		B2C3D4E51F304152637590 /* killeverybody-cli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "killeverybody-cli"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +55,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D41E2F304152637512 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2C3D4E51F3041526375A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D41E2F3041526374A1 /* KillEverybodyApp */,
+				B2C3D4E51F304152637553 /* KillEverybodyCLI */,
 				A1B2C3D41E2F3041526374A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,8 +124,17 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D41E2F304152637490 /* killeverybody.app */,
+				B2C3D4E51F304152637590 /* killeverybody-cli */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B2C3D4E51F304152637553 /* KillEverybodyCLI */ = {
+			isa = PBXGroup;
+			children = (
+				B2C3D4E51F304152637551 /* KillEverybodyCLI.swift */,
+			);
+			path = KillEverybodyCLI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,6 +160,22 @@
 			productName = KillEverybodyApp;
 			productReference = A1B2C3D41E2F304152637490 /* killeverybody.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B2C3D4E51F3041526375A0 /* KillEverybodyCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B2C3D4E51F3041526375C1 /* Build configuration list for PBXNativeTarget "KillEverybodyCLI" */;
+			buildPhases = (
+				B2C3D4E51F3041526375B1 /* Sources */,
+				B2C3D4E51F3041526375A2 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KillEverybodyCLI;
+			productName = KillEverybodyCLI;
+			productReference = B2C3D4E51F304152637590 /* killeverybody-cli */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -167,6 +209,7 @@
 			projectRoot = "";
 			targets = (
 				A1B2C3D41E2F3041526374B0 /* KillEverybodyApp */,
+				B2C3D4E51F3041526375A0 /* KillEverybodyCLI */,
 			);
 		};
 /* End PBXProject section */
@@ -198,6 +241,20 @@
 				A1B2C3D41E2F304152637510 /* MenubarProtectionPresets.swift in Sources */,
 				A1B2C3D41E2F304152637511 /* PolicyDocument.swift in Sources */,
 				A1B2C3D41E2F304152637514 /* KillModalFlow.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B2C3D4E51F3041526375B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2C3D4E51F304152637601 /* DenyList.swift in Sources */,
+				B2C3D4E51F304152637602 /* PlistHelpers.swift in Sources */,
+				B2C3D4E51F304152637603 /* ProcessEnumerator.swift in Sources */,
+				B2C3D4E51F304152637604 /* KillExecutor.swift in Sources */,
+				B2C3D4E51F304152637605 /* MenubarProtectionPresets.swift in Sources */,
+				B2C3D4E51F304152637606 /* PolicyDocument.swift in Sources */,
+				B2C3D4E51F304152637607 /* KillEverybodyCLI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,9 +431,51 @@
 			};
 			name = Release;
 		};
+		B2C3D4E51F3041526375F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 16;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "killeverybody-cli";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.LPFchan.KillEverybody.cli;
+				PRODUCT_NAME = "killeverybody-cli";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B2C3D4E51F3041526375F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 16;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "killeverybody-cli";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.LPFchan.KillEverybody.cli;
+				PRODUCT_NAME = "killeverybody-cli";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B2C3D4E51F3041526375C1 /* Build configuration list for PBXNativeTarget "KillEverybodyCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2C3D4E51F3041526375F0 /* Debug */,
+				B2C3D4E51F3041526375F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A1B2C3D41E2F3041526374C1 /* Build configuration list for PBXNativeTarget "KillEverybodyApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
