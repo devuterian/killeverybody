@@ -101,6 +101,7 @@ Sparkle 2는 피드의 각 업데이트(`<enclosure>`)에 **`sparkle:edSignature
 4. **`v*` 태그**를 푸시해 [Release DMG 워크플로](.github/workflows/release-dmg.yml)가 DMG에 `sign_update`를 적용한 뒤 **`appcast.xml`을 첨부**하도록 합니다.
 5. 브라우저로 `https://github.com/<owner>/<repo>/releases/latest/download/appcast.xml`을 열어 `<enclosure … sparkle:edSignature="…" length="…"/>`가 있는지 확인합니다.
 6. (선택) 저장소 루트에서 `./scripts/verify-sparkle-appcast.sh`를 실행해 같은 URL에 `edSignature`·`length`가 있는지 빠르게 확인할 수 있습니다.
+7. **실제로 돌리는 `.app`에 키가 들어갔는지** 확인: `plutil -p /경로/killeverybody.app/Contents/Info.plist | grep SU` — `SUPublicEDKey`가 비어 있으면 Xcode 생성 Info가 꼬였거나 옛 빌드입니다. 공개 키를 pbxproj에 넣은 뒤 **클린 빌드**한 앱으로 다시 시도하세요.
 
 공식 설명: [Sparkle 문서 — EdDSA (서명)](https://sparkle-project.org/documentation/eddsa-migration/).
 
