@@ -7,9 +7,57 @@ final class MainWindowState: ObservableObject {
     @Published var showSettings = false
 }
 
+/// SwiftUI 호스트에서 `NSWindow`를 잡아 시트형 `NSAlert`에 넘깁니다.
+private struct WindowHostReader: NSViewRepresentable {
+    @Binding var window: NSWindow?
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView(frame: .zero)
+        view.isHidden = true
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            window = nsView.window
+        }
+    }
+}
+
+private struct MainPromptOnCloseObservers: ViewModifier {
+    @Binding var showKillFailureAlert: Bool
+    @Binding var showPolicyAlert: Bool
+    @Binding var showImportConfirm: Bool
+    @Binding var showSettings: Bool
+    @Binding var isWorking: Bool
+    let tryPresent: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: showKillFailureAlert) { open in
+                if !open { tryPresent() }
+            }
+            .onChange(of: showPolicyAlert) { open in
+                if !open { tryPresent() }
+            }
+            .onChange(of: showImportConfirm) { open in
+                if !open { tryPresent() }
+            }
+            .onChange(of: showSettings) { open in
+                if !open { tryPresent() }
+            }
+            .onChange(of: isWorking) { working in
+                if !working { tryPresent() }
+            }
+    }
+}
+
 struct ContentView: View {
     @EnvironmentObject private var settings: SettingsStore
     @EnvironmentObject private var mainWindow: MainWindowState
+
+    @State private var hostWindow: NSWindow?
+    @State private var isMainAlertShowing = false
 
     @State private var isWorking = false
     @State private var pendingCandidates: [KillCandidate] = []
@@ -26,114 +74,108 @@ struct ContentView: View {
     @State private var pendingImportDoc: PolicyDocument?
     @State private var showImportConfirm = false
 
-    private let yellowKill = Color(red: 0.92, green: 0.74, blue: 0.12)
-
-    private var appIconImage: NSImage {
-        NSApp.applicationIconImage ?? NSImage(named: NSImage.applicationIconName) ?? NSImage()
+    var body: some View {
+        mainChromeSheetAndKillAlerts
     }
 
-    var body: some View {
+    private var mainChromeSheetAndKillAlerts: some View {
+        mainChromeSheetAndEarlyAlerts
+            .alert("알림", isPresented: $showNoTargetsAlert) {
+                Button("확인", role: .cancel) {}
+            } message: {
+                Text("지금은 종료할 프로세스가 없어요.")
+            }
+            .alert("일부 실패", isPresented: $showKillFailureAlert) {
+                Button("확인", role: .cancel) {}
+            } message: {
+                Text(killFailureMessage)
+            }
+    }
+
+    private var mainChromeSheetAndEarlyAlerts: some View {
+        mainChromeWithObservers
+            .sheet(isPresented: Binding(
+                get: { mainWindow.showSettings },
+                set: { mainWindow.showSettings = $0 }
+            )) {
+                settingsSheet
+            }
+            .alert("정말 종료할까요?", isPresented: $showCountConfirm) {
+                Button("취소", role: .cancel) {
+                    pendingCandidates = []
+                }
+                Button("kill -9 실행", role: .destructive) {
+                    performKill()
+                }
+            } message: {
+                Text("\(pendingCandidates.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다.")
+            }
+            .alert(policyAlertTitle, isPresented: $showPolicyAlert) {
+                Button("확인", role: .cancel) {}
+            } message: {
+                Text(policyAlertMessage)
+            }
+            .alert("정책을 덮어쓸까요?", isPresented: $showImportConfirm) {
+                Button("취소", role: .cancel) {
+                    pendingImportDoc = nil
+                }
+                Button("덮어쓰기", role: .destructive) {
+                    if let doc = pendingImportDoc {
+                        settings.applyImportedPolicy(doc)
+                        pendingImportDoc = nil
+                        policyAlertTitle = "가져오기 완료"
+                        policyAlertMessage = "예외·메뉴 막대 번들 목록을 바꿨어요."
+                        showPolicyAlert = true
+                    }
+                }
+            } message: {
+                Text("지금 목록이 JSON 파일 내용으로 바뀝니다.")
+            }
+    }
+
+    private var mainChromeWithObservers: some View {
+        mainChromeStack
+            .frame(minWidth: 320, minHeight: 200)
+            .onAppear { tryPresentMainKillAlert() }
+            .onChange(of: hostWindow) { _ in tryPresentMainKillAlert() }
+            .onChange(of: showCountConfirm) { open in
+                if !open { tryPresentMainKillAlert() }
+            }
+            .onChange(of: showNoTargetsAlert) { open in
+                if !open { tryPresentMainKillAlert() }
+            }
+            .modifier(MainPromptOnCloseObservers(
+                showKillFailureAlert: $showKillFailureAlert,
+                showPolicyAlert: $showPolicyAlert,
+                showImportConfirm: $showImportConfirm,
+                showSettings: Binding(
+                    get: { mainWindow.showSettings },
+                    set: { mainWindow.showSettings = $0 }
+                ),
+                isWorking: $isWorking,
+                tryPresent: { tryPresentMainKillAlert() }
+            ))
+    }
+
+    private var mainChromeStack: some View {
         ZStack {
             Color(nsColor: .underPageBackgroundColor)
                 .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Image(nsImage: appIconImage)
-                    .resizable()
-                    .interpolation(.high)
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 64, height: 64)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .shadow(color: .black.opacity(0.12), radius: 4, y: 2)
-
-                Text("다 죽일까요?")
-                    .font(.title2.weight(.bold))
+            VStack(spacing: 12) {
+                Text("killeverybody")
+                    .font(.headline)
+                Text("메뉴의 「설정…」에서 예외를 바꿀 수 있어요.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                VStack(spacing: 10) {
-                    pillActionButton(title: "다죽이기", foreground: .white, background: Color(red: 0.75, green: 0.12, blue: 0.12)) {
-                        startKill(aggressive: true)
-                    }
-                    pillActionButton(title: "적당히 죽이기", foreground: .black, background: yellowKill) {
-                        startKill(aggressive: false)
-                    }
-                    pillActionButton(title: "종료", foreground: .primary, background: Color(nsColor: .separatorColor).opacity(0.35)) {
-                        NSApplication.shared.terminate(nil)
-                    }
-                    .keyboardShortcut(.cancelAction)
-                }
-                .frame(maxWidth: 280)
-            }
-            .padding(28)
-            .background {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(nsColor: .windowBackgroundColor))
-                    .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
-            }
-            .padding(20)
+            WindowHostReader(window: $hostWindow)
+                .frame(width: 0, height: 0)
         }
-        .frame(minWidth: 320, maxWidth: 400)
-        .sheet(isPresented: Binding(
-            get: { mainWindow.showSettings },
-            set: { mainWindow.showSettings = $0 }
-        )) {
-            settingsSheet
-        }
-        .alert("정말 종료할까요?", isPresented: $showCountConfirm) {
-            Button("취소", role: .cancel) {
-                pendingCandidates = []
-            }
-            Button("kill -9 실행", role: .destructive) {
-                performKill()
-            }
-        } message: {
-            Text("\(pendingCandidates.count)개 프로세스에 SIGKILL을 보냅니다. 저장되지 않은 작업은 사라질 수 있습니다.")
-        }
-        .alert(policyAlertTitle, isPresented: $showPolicyAlert) {
-            Button("확인", role: .cancel) {}
-        } message: {
-            Text(policyAlertMessage)
-        }
-        .alert("정책을 덮어쓸까요?", isPresented: $showImportConfirm) {
-            Button("취소", role: .cancel) {
-                pendingImportDoc = nil
-            }
-            Button("덮어쓰기", role: .destructive) {
-                if let doc = pendingImportDoc {
-                    settings.applyImportedPolicy(doc)
-                    pendingImportDoc = nil
-                    policyAlertTitle = "가져오기 완료"
-                    policyAlertMessage = "예외·메뉴 막대 번들 목록을 바꿨어요."
-                    showPolicyAlert = true
-                }
-            }
-        } message: {
-            Text("지금 목록이 JSON 파일 내용으로 바뀝니다.")
-        }
-        .alert("알림", isPresented: $showNoTargetsAlert) {
-            Button("확인", role: .cancel) {}
-        } message: {
-            Text("지금은 종료할 프로세스가 없어요.")
-        }
-        .alert("일부 실패", isPresented: $showKillFailureAlert) {
-            Button("확인", role: .cancel) {}
-        } message: {
-            Text(killFailureMessage)
-        }
-    }
-
-    @ViewBuilder
-    private func pillActionButton(title: String, foreground: Color, background: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.body.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 11)
-                .background(Capsule(style: .continuous).fill(background))
-                .foregroundStyle(foreground)
-        }
-        .buttonStyle(.plain)
-        .disabled(isWorking)
     }
 
     private var settingsSheet: some View {
@@ -209,6 +251,43 @@ struct ContentView: View {
         .frame(minWidth: 440, minHeight: 560)
     }
 
+    private func tryPresentMainKillAlert() {
+        guard let window = hostWindow else { return }
+        guard !isMainAlertShowing, !isWorking else { return }
+        guard !showCountConfirm, !showNoTargetsAlert, !showKillFailureAlert else { return }
+        guard !showPolicyAlert, !showImportConfirm, !mainWindow.showSettings else { return }
+
+        presentMainKillAlert(on: window)
+    }
+
+    private func presentMainKillAlert(on window: NSWindow) {
+        guard !isMainAlertShowing else { return }
+        isMainAlertShowing = true
+
+        let alert = NSAlert()
+        alert.messageText = "다 죽일까요?"
+        alert.informativeText = "강한 종료는 더 많은 앱이 대상이 될 수 있어요."
+        alert.alertStyle = .warning
+        alert.icon = NSApp.applicationIconImage
+        alert.addButton(withTitle: "다죽이기")
+        alert.addButton(withTitle: "적당히 죽이기")
+        alert.addButton(withTitle: "종료")
+
+        alert.beginSheetModal(for: window) { response in
+            isMainAlertShowing = false
+            switch response {
+            case .alertFirstButtonReturn:
+                startKill(aggressive: true)
+            case .alertSecondButtonReturn:
+                startKill(aggressive: false)
+            case .alertThirdButtonReturn:
+                NSApplication.shared.terminate(nil)
+            default:
+                tryPresentMainKillAlert()
+            }
+        }
+    }
+
     private func startKill(aggressive: Bool) {
         isWorking = true
         let protected = settings.protectedBundleIDs()
@@ -243,6 +322,8 @@ struct ContentView: View {
                 if !fails.isEmpty {
                     killFailureMessage = fails.prefix(5).map { "\($0.0): \($0.1)" }.joined(separator: "; ")
                     showKillFailureAlert = true
+                } else {
+                    tryPresentMainKillAlert()
                 }
             }
         }

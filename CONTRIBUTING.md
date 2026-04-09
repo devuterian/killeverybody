@@ -100,6 +100,7 @@ Sparkle 2는 피드의 각 업데이트(`<enclosure>`)에 **`sparkle:edSignature
 3. `generate_keys -x private.txt`로 나온 **한 줄짜리 비밀 시드**를 저장소 **Actions → Secrets → `SPARKLE_PRIVATE_KEY`**에 넣습니다.
 4. **`v*` 태그**를 푸시해 [Release DMG 워크플로](.github/workflows/release-dmg.yml)가 DMG에 `sign_update`를 적용한 뒤 **`appcast.xml`을 첨부**하도록 합니다.
 5. 브라우저로 `https://github.com/<owner>/<repo>/releases/latest/download/appcast.xml`을 열어 `<enclosure … sparkle:edSignature="…" length="…"/>`가 있는지 확인합니다.
+6. (선택) 저장소 루트에서 `./scripts/verify-sparkle-appcast.sh`를 실행해 같은 URL에 `edSignature`·`length`가 있는지 빠르게 확인할 수 있습니다.
 
 공식 설명: [Sparkle 문서 — EdDSA (서명)](https://sparkle-project.org/documentation/eddsa-migration/).
 
