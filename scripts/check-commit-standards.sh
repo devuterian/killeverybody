@@ -32,7 +32,7 @@ is_exception_commit() {
 # 에이전트용 트레일러 대신, 일반 OSS/수동 커밋(Conventional·릴리즈·머지·짧은 명령형 제목)을 허용한다.
 is_oss_style_commit() {
   printf '%s\n' "$subject" | grep -Eqi '^(revert: )?(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\([^)]*\))?!?: .+' && return 0
-  printf '%s\n' "$subject" | grep -Eq '^Release v[0-9]+\.[0-9]+(\.[0-9]+)?(\s|$)' && return 0
+  printf '%s\n' "$subject" | grep -Eq '^Release [vV]?[0-9]+\.[0-9]+(\.[0-9]+)?(\s|$|:)' && return 0
   printf '%s\n' "$subject" | grep -Eq '^Merge (pull request |branch .+ from )' && return 0
   printf '%s\n' "$subject" | grep -Eqi '^(fix|update|add|remove|bump|revert|docs|chore|feat|build|ci|style|refactor|perf|test)\b.+' && return 0
   return 1
@@ -41,7 +41,7 @@ is_oss_style_commit() {
 fail() {
   echo "commit standards check failed: $1" >&2
   echo >&2
-  echo "Use either OSS-style subject (e.g. fix: …, Release v1.2.3, Fix typo in README) or agent trailers:" >&2
+  echo "Use either OSS-style subject (e.g. fix: …, Release v1.2.3 / Release 1.2.3, Fix typo in README) or agent trailers:" >&2
   echo "  project: <project-id>" >&2
   echo "  agent: <agent-id>" >&2
   echo "  role: orchestrator|worker|subagent|operator" >&2
