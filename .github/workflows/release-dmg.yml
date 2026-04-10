@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build (Release, unsigned)
+      - name: Build app + CLI (Release, unsigned)
         run: |
           set -euo pipefail
           DERIVED="${RUNNER_TEMP}/DerivedData"
@@ -28,12 +28,35 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
             build
+          xcodebuild \
+            -project KillEverybodyApp/KillEverybodyApp.xcodeproj \
+            -scheme KillEverybodyCLI \
+            -configuration Release \
+            -destination "generic/platform=macOS" \
+            -derivedDataPath "${DERIVED}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
           APP="${DERIVED}/Build/Products/Release/killeverybody.app"
           if [ ! -d "${APP}" ]; then
             echo "Expected app at ${APP}" >&2
             exit 1
           fi
+          CLI="${DERIVED}/Build/Products/Release/killeverybody-cli"
+          if [ ! -x "${CLI}" ]; then
+            echo "Expected CLI at ${CLI}" >&2
+            exit 1
+          fi
           echo "APP_PATH=${APP}" >> "${GITHUB_ENV}"
+          echo "CLI_PATH=${CLI}" >> "${GITHUB_ENV}"
+
+      - name: CLI dry-run (release smoke)
+        run: |
+          set -euo pipefail
+          "${CLI_PATH}" --dry-run --json | head -c 8000
+          echo
+          "${CLI_PATH}" --aggressive --dry-run --json | head -c 4000
+          echo
 
       - name: Create DMG
         run: |
@@ -42,6 +65,8 @@ jobs:
           rm -rf "${STAGING}"
           mkdir -p "${STAGING}"
           cp -R "${APP_PATH}" "${STAGING}/"
+          cp "${CLI_PATH}" "${STAGING}/killeverybody-cli"
+          chmod a+x "${STAGING}/killeverybody-cli"
           ln -sf /Applications "${STAGING}/Applications"
           DMG="${GITHUB_WORKSPACE}/KillEverybody-macOS.dmg"
           rm -f "${DMG}"
@@ -128,7 +153,8 @@ jobs:
             echo ""
             echo "**설치**"
             echo "1. \`KillEverybody-macOS.dmg\`를 받아 연 다음 \`killeverybody.app\`을 **응용 프로그램**으로 옮기면 끝이에요."
-            echo "2. 처음엔 보안 창이 뜰 수 있어요. **우클릭 → 열기**로 한 번 열어 주거나, **시스템 설정 → 개인 정보 보호 및 보안**에서 허용해 주세요."
+            echo "2. (선택) 같은 DMG 안의 \`killeverybody-cli\`는 터미널용입니다. 예: \`/Volumes/killeverybody/killeverybody-cli --dry-run\` (기본은 목록만, \`--execute --yes\`일 때만 SIGKILL). PATH에 두려면 \`/usr/local/bin\` 등으로 복사하세요."
+            echo "3. 처음엔 보안 창이 뜰 수 있어요. **우클릭 → 열기**로 한 번 열어 주거나, **시스템 설정 → 개인 정보 보호 및 보안**에서 허용해 주세요."
           } > "${OUT}"
 
       - name: GitHub Release에 DMG 업로드
