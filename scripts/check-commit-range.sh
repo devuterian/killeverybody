@@ -19,12 +19,24 @@ peel_commit() {
   git -C "$repo_root" rev-parse "$1^{commit}"
 }
 
+# shallow checkout·force-push 후 이전 팁(before)이 로컬에 없으면 base 해석이 실패한다.
+# 그때는 head 한 커밋만 검사한다 (CI가 깨지지 않게).
+peel_commit_optional() {
+  git -C "$repo_root" rev-parse "$1^{commit}" 2>/dev/null || return 1
+}
+
 # GitHub push 이벤트에서 최초 푸시·일부 태그 푸시는 before 가 40자 0 이라 범위가 무효다.
 # 전체 히스토리를 돌리면 과거 커밋까지 검사해 항상 실패할 수 있으므로, 팁 커밋만 검사한다.
 if [ "$base" = "0000000000000000000000000000000000000000" ]; then
   commits=$(peel_commit "$head")
+elif base_p=$(peel_commit_optional "$base") && head_p=$(peel_commit "$head"); then
+  if ! commits=$(git -C "$repo_root" rev-list "${base_p}..${head_p}" 2>/dev/null); then
+    echo "check-commit-range: rev-list failed for ${base}..${head}; checking head only" >&2
+    commits=$head_p
+  fi
 else
-  commits=$(git -C "$repo_root" rev-list "$(peel_commit "$base")..$(peel_commit "$head")")
+  echo "check-commit-range: base ${base} not in this clone (e.g. shallow or rewritten); checking head only" >&2
+  commits=$(peel_commit "$head")
 fi
 
 if [ -z "$commits" ]; then
