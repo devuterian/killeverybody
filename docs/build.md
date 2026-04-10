@@ -20,6 +20,8 @@ xcodebuild -scheme KillEverybodyApp -configuration Debug build CODE_SIGNING_ALLO
 
 산출물은 `…/Build/Products/Debug/killeverybody.app` (또는 Release)입니다. 로그의 `BUILD_DIR` / DerivedData를 참고하세요.
 
+**GitHub Releases DMG**(`KillEverybody-macOS.dmg`)를 열면 **`killeverybody.app`** 옆에 **`killeverybody-cli`** 실행 파일도 같이 들어 있습니다(Sparkle 업데이트로 받는 DMG도 동일).
+
 ## CLI (`killeverybody-cli`)
 
 GUI 없이 **같은 후보 수집 로직**을 터미널에서 돌릴 수 있습니다. 소스는 `KillEverybodyApp/KillEverybodyCLI/`이고, Xcode 스킴 **KillEverybodyCLI**로 빌드하면 `killeverybody-cli` 실행 파일이 나옵니다.

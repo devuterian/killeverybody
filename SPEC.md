@@ -6,7 +6,7 @@
 - **Canonical repo:** [github.com/devuterian/killeverybody](https://github.com/devuterian/killeverybody)
 - **Project id:** `killeverybody`
 - **Primary surface:** macOS SwiftUI 앱 — [`KillEverybodyApp/`](KillEverybodyApp/)
-- **Last updated:** 2026-04-09 (v2.0.0·영감 출처 README 반영)
+- **Last updated:** 2026-04-09 (v2.2.0·DMG에 CLI 동봉·릴리즈 워크플로)
 
 ## Project thesis
 

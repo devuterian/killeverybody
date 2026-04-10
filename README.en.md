@@ -20,7 +20,8 @@ Inspired by kippler’s Windows utility **AllKill** (*다죽여*): [http://kippl
 
 1. Grab the latest DMG from **[Releases](https://github.com/devuterian/killeverybody/releases)** (`KillEverybody-macOS.dmg`).
 2. Open the disk image and drag **killeverybody.app** into **Applications**.
-3. Launch the app.
+3. Optional: **`killeverybody-cli`** in the same DMG is a terminal helper (default `--dry-run` lists candidates only). See [`docs/build.md`](docs/build.md).
+4. Launch the app.
 
 **Gatekeeper:** This build is produced in CI and may be **unsigned / not notarized**. If macOS blocks it, use **Right-click → Open** once, or allow it under **System Settings → Privacy & Security**.
 

@@ -20,7 +20,8 @@
 
 1. **[Releases에서 최신 DMG](https://github.com/devuterian/killeverybody/releases)** 를 받아요. (`KillEverybody-macOS.dmg`)
 2. DMG를 열고, **killeverybody.app**을 **응용 프로그램** 폴더에 끌어다 놓아요.
-3. 앱을 실행하면 끝이에요.
+3. (선택) 같은 DMG 안 **killeverybody-cli**는 터미널에서 후보만 보거나(`--dry-run`) 실행할 수 있어요. 자세한 옵션은 [`docs/build.md`](docs/build.md)를 봐 주세요.
+4. 앱을 실행하면 끝이에요.
 
 **보안 경고가 뜨면:** GitHub Actions로 자동 빌드한 앱이라 **개발자 서명·공증이 없을 수** 있어요. **우클릭 → 열기**로 한 번만 실행하거나, **시스템 설정 → 개인 정보 보호 및 보안**에서 허용해 주면 돼요.
 

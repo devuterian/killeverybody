@@ -33,6 +33,7 @@ is_exception_commit() {
 is_oss_style_commit() {
   printf '%s\n' "$subject" | grep -Eqi '^(revert: )?(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\([^)]*\))?!?: .+' && return 0
   printf '%s\n' "$subject" | grep -Eq '^Release [vV]?[0-9]+\.[0-9]+(\.[0-9]+)?(\s|$|:)' && return 0
+  printf '%s\n' "$subject" | grep -Eqi '^release: .+' && return 0
   printf '%s\n' "$subject" | grep -Eq '^Merge (pull request |branch .+ from )' && return 0
   printf '%s\n' "$subject" | grep -Eqi '^(fix|update|add|remove|bump|revert|docs|chore|feat|build|ci|style|refactor|perf|test)\b.+' && return 0
   return 1
