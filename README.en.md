@@ -20,7 +20,7 @@ Inspired by kippler’s Windows utility [AllKill](http://kippler.com/allkill/) (
 
 > **Warning:** This app sends `SIGKILL` to target processes. Any unsaved work in those apps may be lost.
 
-**다죽이기 (Kill Everything)** and **적당히 죽이기 (Kill Moderately)** start immediately, without another confirmation. That behavior is intentional. Try the `killeverybody-cli` dry run included in the DMG first.
+**Kill Everybody** and **Spare Some** start immediately, without another confirmation. That behavior is intentional. Try the `killeverybody-cli` dry run included in the DMG first.
 
 ```bash
 /Volumes/killeverybody/killeverybody-cli --dry-run
@@ -30,9 +30,11 @@ Inspired by kippler’s Windows utility [AllKill](http://kippler.com/allkill/) (
 
 | Feature | What it does |
 | --- | --- |
-| **다죽이기 (Kill Everything)** | Kills running apps and their child processes. Only the fixed system denylist and killeverybody itself are spared; saved exemptions do not apply. |
-| **적당히 죽이기 (Kill Moderately)** | Uses the same scope, but skips apps you exempted, apps treated as menu-bar utilities, built-in presets, and `LSUIElement` apps. |
-| **예외 앱… (Exempt Apps…)** | Shows apps with their icons and lets you search by name, bundle ID, or path. Filters cover `전체 앱` (all), `실행 중` (running), and `로그인 시 실행` (open at login). |
+| **Kill Everybody** | Kills running apps and their child processes. Only the fixed system denylist and killeverybody itself are spared; saved exemptions do not apply. |
+| **Spare Some** | Uses the same scope, but skips apps you exempted, apps treated as menu-bar utilities, built-in presets, and `LSUIElement` apps. |
+| **Manage Exceptions…** | Shows apps with their icons and lets you search by name, bundle ID, or path. Filters and a remembered sort menu keep the list manageable. |
+| **Force Quit This App** | Right-click a running app to quit only that app and its child or helper processes, with no extra confirmation. Its exemption stays unchanged. |
+| **한국어 · English · 日本語** | Choose a language under Advanced and the main alert and settings UI update immediately. |
 | **Relaunch suppression** | Unloads matching third-party LaunchAgents for the current login session. They can load normally again after the next login. |
 | **Automatic updates** | Sparkle checks GitHub Releases and automatically downloads and installs an update when possible. |
 
@@ -48,24 +50,26 @@ Requires **macOS 13 Ventura or later**.
 
 The current GitHub Actions build is **not Apple Developer ID signed or notarized**. If macOS blocks it, use **Right-click → Open** once, or allow it under **System Settings → Privacy & Security**.
 
-Sparkle checks for a new version in the background when the app starts. Use **업데이트 확인… (Check for Updates…)** from the app menu to check manually, or **최신 릴리즈 열기… (Open Latest Release…)** to download it in a browser. Sparkle verifies update DMGs with an EdDSA signature.
+Sparkle checks for a new version in the background when the app starts. Use **Check for Updates…** from the app menu to check manually, or **Open Latest Release…** to download it in a browser. Sparkle verifies update DMGs with an EdDSA signature.
 
 ## How to use it
 
-1. Launching the app opens a native macOS-style **“다 죽일까요? (Kill everybody?)”** alert.
-2. Choose **다죽이기 (Kill Everything)** when you really want to clear out everything in scope.
-3. To keep selected apps alive, check them under **예외 앱… (Exempt Apps…)**, then choose **적당히 죽이기 (Kill Moderately)**.
-4. Choose **종료 (Quit)**, or press `Esc`, to close only killeverybody.
+1. Launching the app opens a native macOS-style **“Kill everybody?”** alert.
+2. Choose **Kill Everybody** when you really want to clear out everything in scope.
+3. To keep selected apps alive, check them under **Manage Exceptions…**, then choose **Spare Some**.
+4. Choose **Quit**, or press `Esc`, to close only killeverybody.
 
-### Apps that survive 적당히 죽이기
+### Apps to Spare
 
-Choose **예외 앱… (Exempt Apps…)** to open a separate settings window.
+Choose **Manage Exceptions…** to open a separate settings window.
 
 - Installed and running apps appear with their icons.
 - Search by app name, bundle ID, or path.
+- Sort by **Protected First** (default), **Unprotected First**, or **Name**. The last choice is remembered.
+- Right-click a running app and choose **Force Quit This App** to immediately quit that app and its child or helper processes. A successful action quietly refreshes its running status; only failures show an alert.
 - On the first launch only, macOS login apps are checked as initial exemptions. Reading that list does not ask for an administrator password.
 - Checkbox changes are saved immediately.
-- Under **고급 (Advanced)**, you can enter a bundle ID directly or mark a bundle as a menu-bar-style app.
+- Under **Advanced**, choose 한국어, English, or 日本語, enter a bundle ID directly, or mark a bundle as a menu-bar-style app.
 - Export the current exemption and menu-bar policy as JSON, or import it later.
 
 ## CLI and dry runs

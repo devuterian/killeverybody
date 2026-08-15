@@ -82,11 +82,25 @@ enum ProcessEnumerator {
         )
     }
 
+    /// 예외 목록의 한 앱만 강제 종료할 때 사용한다. 선택한 앱과 자식 프로세스만 반환한다.
+    static func collectApplicationKillCandidates(
+        bundleID: String,
+        excludingPID: pid_t = getpid()
+    ) -> [KillCandidate] {
+        collectApplicationProcesses(
+            protectedBundleIDs: [],
+            respectUserAndAgentProtection: false,
+            targetBundleID: bundleID,
+            excludingPID: excludingPID
+        )
+    }
+
     /// 실행 중인 앱을 루트로 삼아 그 자식 프로세스까지 모은다.
     /// 같은 UID라는 이유만으로 시스템 에이전트나 셸 전체를 대상으로 삼지는 않는다.
     private static func collectApplicationProcesses(
         protectedBundleIDs: Set<String>,
         respectUserAndAgentProtection: Bool,
+        targetBundleID: String? = nil,
         excludingPID: pid_t
     ) -> [KillCandidate] {
         let uid = getuid()
@@ -108,6 +122,12 @@ enum ProcessEnumerator {
                 ?? app.bundleURL
             let ownerBundleID = appRoot.flatMap(PlistHelpers.bundleIdentifier)
                 ?? app.bundleIdentifier
+            if let targetBundleID,
+               ownerBundleID != targetBundleID,
+               app.bundleIdentifier != targetBundleID
+            {
+                continue
+            }
             let name = appRoot.map { FileManager.default.displayName(atPath: $0.path) }
                 ?? app.localizedName
                 ?? "pid \(seedPID)"
