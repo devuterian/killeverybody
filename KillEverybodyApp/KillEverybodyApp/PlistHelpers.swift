@@ -21,4 +21,25 @@ enum PlistHelpers {
         }
         return nil
     }
+
+    /// 실행 파일이 Helper.app 안에 있어도 가장 바깥쪽 앱 번들을 반환한다.
+    static func topLevelApplicationRoot(from path: String) -> URL? {
+        var url = URL(fileURLWithPath: path)
+        var result: URL?
+        while url.path != "/" {
+            if url.pathExtension.lowercased() == "app" {
+                result = url
+            }
+            url.deleteLastPathComponent()
+        }
+        return result
+    }
+
+    static func bundleIdentifier(bundleURL: URL) -> String? {
+        if let id = Bundle(url: bundleURL)?.bundleIdentifier, !id.isEmpty {
+            return id
+        }
+        let plist = bundleURL.appendingPathComponent("Contents/Info.plist")
+        return (NSDictionary(contentsOf: plist) as? [String: Any])?["CFBundleIdentifier"] as? String
+    }
 }

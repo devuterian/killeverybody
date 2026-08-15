@@ -4,6 +4,7 @@ import Foundation
 final class SettingsStore: ObservableObject {
     private let exemptKey = "exemptBundleIDs"
     private let menubarKey = "menubarStyleBundleIDs"
+    private let didSeedLoginItemsKey = "didSeedLoginItems"
 
     @Published var exemptBundleIDs: [String] {
         didSet { save() }
@@ -13,13 +14,20 @@ final class SettingsStore: ObservableObject {
         didSet { save() }
     }
 
+    @Published private(set) var loginItemBundleIDs: Set<String>
+
     init() {
         let d = UserDefaults.standard
-        if let saved = d.stringArray(forKey: exemptKey), !saved.isEmpty {
-            exemptBundleIDs = saved
-        } else {
-            exemptBundleIDs = []
+        var exempt = d.stringArray(forKey: exemptKey) ?? []
+        let loginURLs = LoginItemProvider.applicationURLs()
+        let loginIDs = loginURLs.map(LoginItemProvider.bundleIDs) ?? []
+        if !d.bool(forKey: didSeedLoginItemsKey), loginURLs != nil {
+            exempt = Array(Set(exempt).union(loginIDs)).sorted()
+            d.set(true, forKey: didSeedLoginItemsKey)
+            d.set(exempt, forKey: exemptKey)
         }
+        exemptBundleIDs = exempt
+        loginItemBundleIDs = loginIDs
         if let m = d.stringArray(forKey: menubarKey), !m.isEmpty {
             menubarStyleBundleIDs = m
         } else {
@@ -42,6 +50,18 @@ final class SettingsStore: ObservableObject {
 
     func removeExempt(at offsets: IndexSet) {
         exemptBundleIDs.remove(atOffsets: offsets)
+    }
+
+    func isExempt(_ id: String) -> Bool {
+        exemptBundleIDs.contains(id)
+    }
+
+    func setExempt(_ id: String, enabled: Bool) {
+        if enabled {
+            addExempt(id)
+        } else {
+            exemptBundleIDs.removeAll { $0 == id }
+        }
     }
 
     func addMenubarStyle(_ id: String) {

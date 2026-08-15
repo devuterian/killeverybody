@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 
-/// Headless CLI: same enumeration as the GUI app (user-session kill modes), for terminals and CI on macOS.
+/// Headless CLI: same app-centered enumeration as the GUI app, for terminals and CI on macOS.
 @main
 enum KillEverybodyCLI {
     static func main() {
@@ -74,10 +74,15 @@ enum KillEverybodyCLI {
         }
 
         let pids = list.map(\.pid)
+        let bundleIDs = Set(list.compactMap(\.bundleID))
+        let agentFailures = LaunchAgentSuppressor.bootout(bundleIDs: bundleIDs)
         let failures = KillExecutor.killLocally(pids: pids)
-        if failures.isEmpty {
+        if failures.isEmpty, agentFailures.isEmpty {
             fputs("killeverybody-cli: SIGKILL sent to \(pids.count) process(es).\n", stderr)
             exit(0)
+        }
+        for failure in agentFailures {
+            fputs("killeverybody-cli: launchctl bootout \(failure.label): \(failure.reason)\n", stderr)
         }
         for (pid, err) in failures {
             fputs("killeverybody-cli: kill \(pid): \(err)\n", stderr)
@@ -150,16 +155,16 @@ enum KillEverybodyCLI {
     private static func printHelp() {
         print(
             """
-            killeverybody-cli — list or kill user-session processes (same logic as the GUI app).
+            killeverybody-cli — list or kill running apps and their child processes.
 
             Usage:
               killeverybody-cli [options]
 
             Options:
-              -m, --moderate     Moderate mode: denylist + exempt bundles + LSUIElement + menubar presets (default)
-              -a, --aggressive   Aggressive mode: denylist only
+              -m, --moderate     Moderate mode: exempt bundles + LSUIElement + menubar presets (default)
+              -a, --aggressive   Aggressive mode: every running app except fixed denylist
                   --dry-run      Print candidates only (default)
-                  --execute      Send SIGKILL (requires --yes)
+                  --execute      Boot out matching session agents, then send SIGKILL (requires --yes)
                   --yes          Confirm execute
                   --policy PATH  Merge exempt + menubar bundle IDs from policy JSON (app export format)
                   --json         JSON output (still obeys dry-run / execute)

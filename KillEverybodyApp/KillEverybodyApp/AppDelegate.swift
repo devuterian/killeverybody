@@ -46,13 +46,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
             log.info("Sparkle SUFeedURL: \(feed, privacy: .public)")
         }
 
-        updaterController = SPUStandardUpdaterController(
+        let controller = SPUStandardUpdaterController(
             startingUpdater: true,
             updaterDelegate: self,
             userDriverDelegate: nil
         )
+        updaterController = controller
+        if controller.updater.automaticallyChecksForUpdates {
+            // 이 앱은 보통 금방 종료되므로 예약 시각을 기다리지 않고 시작 직후 한 번 확인합니다.
+            controller.updater.checkForUpdatesInBackground()
+        }
 
         KillModalFlow.shared.attachAndStart(settings: KillEverybodySession.settings)
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
     }
 
     /// Dock 아이콘 클릭 등 → 업데이트 확인.
@@ -78,12 +87,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate {
     // MARK: - SPUUpdaterDelegate (Console / log stream 진단용)
 
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        log.error("didAbortWithError: \(error.localizedDescription, privacy: .public)")
+        if isNoUpdate(error) {
+            log.info("No newer update is available.")
+        } else {
+            log.error("didAbortWithError: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: Error?) {
         if let error {
-            log.error("didFinishUpdateCycleFor error: \(error.localizedDescription, privacy: .public)")
+            if isNoUpdate(error) {
+                log.info("Background update check finished normally.")
+            } else {
+                log.error("didFinishUpdateCycleFor error: \(error.localizedDescription, privacy: .public)")
+            }
         }
+    }
+
+    private func isNoUpdate(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        return nsError.domain == SUSparkleErrorDomain && nsError.code == 1001
     }
 }

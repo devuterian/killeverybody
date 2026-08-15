@@ -28,6 +28,8 @@
 	<string></string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://github.com/devuterian/killeverybody/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>

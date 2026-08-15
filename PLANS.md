@@ -17,6 +17,7 @@
 - **Preconditions:** 실사용 로그·이슈 수집.
 - **Earliest likely start:** MVP 공개 후.
 - **진행:** 내장 **프리셋 번들** + 설정의 **메뉴 막대로 취급할 번들**이 반영됨. 머신러닝·자동 학습은 미구현.
+- **진행:** 설치 앱 목록·실행 상태·로그인 항목 필터와 앱 단위 예외까지 반영. 헬퍼 프로세스는 가장 바깥쪽 앱 번들로 묶음.
 - **Related ids:** —
 
 ### Signed release / notarization
@@ -53,10 +54,16 @@
 
 ### Near Term
 
-- **Initiative:** 실제 Mac에서 GUI-only / 사용자 전체 모드 스모크 테스트
+- **Initiative:** 실제 Mac에서 앱 중심 두 모드 스모크 테스트
   - **Why now:** CI에서 macOS GUI 앱을 돌리기 어렵다.
   - **Dependencies:** Xcode 설치된 기기.
-  - **Related ids:** `LOG-20260409-001`
+  - **진행:** GUI·검색·로그인 앱 기본 체크·CLI dry-run 확인 완료. 실제 전체 종료는 현재 세션 보호를 위해 미실행.
+  - **Related ids:** `LOG-20260409-001`, `LOG-20260815-001`
+
+- **Initiative:** 자동 재실행되는 서드파티 앱 억제
+  - **Status:** 현재 GUI 세션 LaunchAgent bootout 구현·격리 KeepAlive 테스트 완료.
+  - **Boundary:** plist와 영구 로그인 설정은 수정하지 않음. macOS가 관리하는 시스템 앱은 다시 켜질 수 있음.
+  - **Related ids:** `DEC-20260815-001`, `LOG-20260815-001`
 
 - **Initiative:** `LICENSE` 추가 여부 결정 및 README 라이선스 문단과 정합
   - **Status:** 완료(MIT).

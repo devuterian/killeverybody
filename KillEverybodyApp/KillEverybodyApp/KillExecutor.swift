@@ -9,6 +9,7 @@ enum KillExecutor {
         var failures: [(pid_t, String)] = []
         for pid in pids {
             if kill(pid, SIGKILL) != 0 {
+                if errno == ESRCH { continue }
                 let err = String(cString: strerror(errno))
                 failures.append((pid, err))
             }

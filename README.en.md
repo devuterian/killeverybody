@@ -32,18 +32,20 @@ Inspired by kippler’s Windows utility **AllKill** (*다죽여*): [http://kippl
 ## How it works
 
 1. The window asks **whether you really want to wipe things out** (wording may vary by language; the Korean build uses a short, direct question).
-2. **Kill (aggressive)** — Kills your login session’s processes except a **hardcoded system denylist**. It does **not** honor your exempt bundles, menu-bar presets, or LSUIElement-style skips.
-3. **Kill (moderate)** — Same idea, but keeps the **normal protections**: denylist, bundles you exempt in Settings, menu-bar-style bundles, LSUIElement heuristics, and built-in presets.
-4. You get a **confirmation** with a process count before anything is killed. Unsaved work can vanish.
-5. **Quit** just exits the app.
+2. **Kill (aggressive)** — Kills running apps and their child processes. Saved exemptions do **not** apply.
+3. **Kill (moderate)** — Uses the same app-centered scope, but skips exempt apps, menu-bar apps, and LSUIElement apps.
+4. **Exempt Apps…** opens a searchable list with app icons. macOS login apps are checked once on first launch, and later changes save immediately.
+5. The kill buttons run without another confirmation. On success, killeverybody quits too; it shows a result only when something fails.
+6. **Quit** just exits the app.
 
-Open **Settings…** from the **killeverybody** menu (⌘,) for exempt bundle IDs, menu-bar-style bundles, and policy JSON import/export.
+When a third-party app is kept alive by a matching LaunchAgent, killeverybody unloads that agent for the **current login session only**. It does not change the plist, so the app can start normally after the next login.
 
 ---
 
 ## Limitations
 
 - Menu-bar apps aren’t classified perfectly. **Moderate** mode is there to reduce collateral damage; **aggressive** is not subtle.
+- System apps managed by macOS, such as Finder, may start again.
 - This tool does **not** promise a stable or safe system.
 
 ---
