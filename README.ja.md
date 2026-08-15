@@ -1,77 +1,131 @@
 <div align="center">
-  <img src="docs/readme-app-icon.png" width="256" height="256" alt="killeverybody アプリアイコン" />
-</div>
 
-<div align="center">
+<img src="docs/readme-app-icon.png" width="220" alt="killeverybody アプリアイコン" />
 
-# killeverybody <br>
+# killeverybody
 
-[한국어](README.md) | [English](README.en.md) | [日本語](README.ja.md)
+### Mac で実行中のアプリとその子プロセスをまとめて整理します。
 
-macOS 上のプロセスを **SIGKILL** で終了させるユーティリティです。システムに必須のものは除外し、**ほぼ全部終わらせる**か**いつも通りフィルタしたうえで終わらせる**かを選べます。
+[한국어](README.md) | [English](README.en.md) | **日本語**
 
-着想の一部は、キプラー氏の Windows 向け **다죽여**（AllKill）です。[http://kippler.com/allkill/](http://kippler.com/allkill/)
+このドキュメントは **v3.0.0** に対応しています。
+
+キプラー氏の Windows 用ツール [AllKill](http://kippler.com/allkill/)（*다죽여*）に着想を得て作りました。
 
 </div>
 
 ---
 
-## インストール
+## 最初にお読みください
 
-1. **[Releases](https://github.com/devuterian/killeverybody/releases)** から最新の DMG（`KillEverybody-macOS.dmg`）を入手します。
-2. DMG を開き、**killeverybody.app** を **アプリケーション** フォルダに入れます。
-3. （任意）同じ DMG 内の **killeverybody-cli** はターミナル用です（既定 `--dry-run` は候補表示のみ）。詳しくは [`docs/build.md`](docs/build.md)。
-4. アプリを起動します。
+> **注意:** このアプリは対象プロセスに `SIGKILL` を送ります。保存していない作業は失われる場合があります。
 
-**セキュリティ:** CI でビルドしており、**開発者署名・公証がない**場合があります。ブロックされたら **右クリック → 開く** で一度開くか、**システム設定 → プライバシーとセキュリティ** で許可してください。
+**다죽이기（すべて終了）**と**적당히 죽이기（控えめに終了）**は、ボタンを押すと追加確認なしですぐ実行されます。これは意図した動作です。最初は DMG に同梱されている `killeverybody-cli` でドライランすることをおすすめします。
 
-**アップデート:** メニュー **killeverybody → アップデートを確認…**（Sparkle）。手動なら **最新リリースを開く…** から Releases へ。
+```bash
+/Volumes/killeverybody/killeverybody-cli --dry-run
+```
 
----
+## 機能
+
+| 機能 | 動作 |
+| --- | --- |
+| **다죽이기（すべて終了）** | 実行中のアプリとその子プロセスを終了します。固定のシステム保護リストと killeverybody 自身だけを残し、保存した例外は適用しません。 |
+| **적당히 죽이기（控えめに終了）** | 同じ範囲から、ユーザーが選んだ例外アプリ、メニューバー扱いのアプリ、内蔵プリセット、`LSUIElement` アプリを除外します。 |
+| **예외 앱…（例外アプリ…）** | アイコン付きのアプリ一覧を、名前・バンドル ID・パスで検索してチェックできます。`전체 앱`（すべて）、`실행 중`（実行中）、`로그인 시 실행`（ログイン時に実行）のフィルターもあります。 |
+| **再起動の抑制** | 対象アプリに一致するサードパーティ製 LaunchAgent を、現在のログインセッションだけ停止します。次回ログイン時には通常どおり読み込まれます。 |
+| **自動アップデート** | Sparkle が GitHub Releases を確認し、可能な場合は新しいアップデートを自動でダウンロードしてインストールします。 |
+
+すべて正常に終了できた場合、結果ダイアログを出さずに killeverybody も正常終了します。失敗した項目がある場合だけ結果を表示し、必要に応じて管理者権限での再試行を選べます。
+
+## インストールとアップデート
+
+動作環境は **macOS 13 Ventura 以降**です。
+
+1. [最新リリース](https://github.com/devuterian/killeverybody/releases/latest)から `KillEverybody-macOS.dmg` をダウンロードします。
+2. DMG を開き、`killeverybody.app` を **アプリケーション**フォルダに移します。
+3. アプリを起動します。
+
+現在の GitHub Actions 版には **Apple Developer ID 署名と公証がありません**。macOS にブロックされた場合は、アプリを一度 **右クリック → 開く** で起動するか、**システム設定 → プライバシーとセキュリティ**から許可してください。
+
+アプリの起動時に Sparkle がバックグラウンドで新しいバージョンを確認します。手動で確認する場合はアプリメニューの **업데이트 확인…（アップデートを確認…）**、ブラウザで入手する場合は **최신 릴리즈 열기…（最新リリースを開く…）** を選びます。アップデート DMG の整合性は Sparkle の EdDSA 署名で確認されます。
 
 ## 使い方
 
-1. ウィンドウに **一括終了の確認** が表示されます（日本語版では文言がローカライズされます）。
-2. **全て終了（強）** — 実行中のアプリとその子プロセスを終了します。保存した例外は **適用しません**。
-3. **控えめに終了** — 同じ範囲から、例外アプリ・メニューバーアプリ・LSUIElement アプリを除いて終了します。
-4. **例外アプリ…** では、アイコン付きのアプリ一覧を検索してチェックできます。初回起動時だけ macOS のログイン項目を既定でチェックし、その後の変更はすぐ保存します。
-5. 終了ボタンを押すと追加確認なしで実行します。成功時は killeverybody も終了し、失敗時だけ結果を表示します。
-6. **終了** はアプリだけ閉じます。
+1. アプリを起動すると、macOS 標準スタイルの **「다 죽일까요?（すべて終了しますか？）」** ダイアログが開きます。
+2. 対象をすべて整理する場合は **다죽이기（すべて終了）**を選びます。
+3. 残したいアプリがある場合は、先に **예외 앱…（例外アプリ…）**でチェックしてから **적당히 죽이기（控えめに終了）**を選びます。
+4. killeverybody だけを閉じる場合は **종료（終了）**を選ぶか、`Esc` キーを押します。
 
-一致する LaunchAgent によって再起動されるサードパーティ製アプリは、**現在のログインセッションだけ**エージェントを停止します。plist は変更しないため、次回ログイン時には通常どおり起動できます。
+### 적당히 죽이기 で残すアプリ
 
----
+**예외 앱…（例外アプリ…）**を選ぶと、別の設定ウィンドウが開きます。
 
-## できないこと
+- インストール済み・実行中のアプリをアイコン付きで表示します。
+- アプリ名、バンドル ID、パスで検索できます。
+- 初回起動時だけ、macOS のログインアプリを初期例外としてチェックします。この一覧の読み取りで管理者パスワードを求めることはありません。
+- チェックの変更はすぐ保存されます。
+- **고급（詳細）**タブではバンドル ID を直接入力したり、メニューバーアプリとして扱うバンドルを追加したりできます。
+- 現在の例外・メニューバー設定を JSON で書き出し、あとから読み込めます。
 
-- メニューバー常駐アプリの判定は **完璧ではありません**。**控えめに終了** で被害を減らす想定です。
-- Finder など macOS が管理するシステムアプリは再起動することがあります。
-- システムの安定動作を **保証しません**。
+## CLI とドライラン
 
----
+DMG 内の `killeverybody-cli` は、デフォルトでドライランします。候補を表示するだけで、シグナルは送りません。
 
-## ソース・コントリビューション
+```bash
+# 控えめに終了する候補
+/Volumes/killeverybody/killeverybody-cli --dry-run
 
-リポジトリ: [github.com/devuterian/killeverybody](https://github.com/devuterian/killeverybody)
+# すべて終了する候補
+/Volumes/killeverybody/killeverybody-cli --aggressive --dry-run
 
-- ビルド: [`docs/build.md`](docs/build.md)
-- コントリビュート・Sparkle 用シークレット: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- スモーク: [`docs/smoke-test.md`](docs/smoke-test.md)
-- 仕様メモ: [`SPEC.md`](SPEC.md)
+# JSON で表示
+/Volumes/killeverybody/killeverybody-cli --dry-run --json
 
-不具合・質問は [Issues](https://github.com/devuterian/killeverybody/issues) へ。
+# アプリから書き出したポリシー JSON を適用
+/Volumes/killeverybody/killeverybody-cli --policy ./killeverybody-policy.json --dry-run
+```
 
----
+CLI はアプリに保存された設定を自動では読みません。同じ例外を使うには、アプリからポリシー JSON を書き出して `--policy` で指定してください。実際の終了は `--execute` と `--yes` を両方指定した場合だけ動作します。
+
+## 対象範囲と制限
+
+- 対象は、**現在のユーザーが実行しているアプリとその子プロセス**です。UID が同じという理由だけで、すべてのシェルやバックグラウンドプロセスを終了することはありません。
+- macOS の主要プロセスと killeverybody 自身は、固定の保護リストで除外します。
+- アプリのヘルパーは、最も外側のアプリバンドルにまとめて例外を判断します。
+- 再起動の抑制は、`~/Library/LaunchAgents` と `/Library/LaunchAgents` にある一致したサードパーティ製項目を、現在の GUI セッションだけ停止します。plist やログイン項目は変更しません。
+- メニューバーアプリの判定には公開 API のヒューリスティックを使うため、完璧ではありません。
+- Finder など macOS が直接管理するアプリは再起動する場合があります。
+- データの保護やシステムの安定動作は保証しません。大切な作業は先に保存してください。
+
+## ビルド
+
+Xcode で `KillEverybodyApp/KillEverybodyApp.xcodeproj` を開き、**KillEverybodyApp** スキームを実行します。コマンドラインでビルドする場合は次のとおりです。
+
+```bash
+cd KillEverybodyApp
+xcodebuild -scheme KillEverybodyApp -configuration Debug build CODE_SIGNING_ALLOWED=NO
+```
+
+CLI は **KillEverybodyCLI** スキームでビルドできます。詳しくは [`docs/build.md`](docs/build.md)をご覧ください。
+
+## ソースとコントリビューション
+
+- リポジトリ: [github.com/devuterian/killeverybody](https://github.com/devuterian/killeverybody)
+- コントリビューションと Sparkle 設定: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- 手動スモークテスト: [`docs/smoke-test.md`](docs/smoke-test.md)
+- 動作仕様: [`SPEC.md`](SPEC.md)
+- 不具合と質問: [Issues](https://github.com/devuterian/killeverybody/issues)
 
 ## ライセンス
 
-[MIT License](LICENSE)。危険なツールであることと免責条項は本文を確認してください。
+[MIT License](LICENSE)です。危険性のあるツールなので、免責事項も確認してください。
 
 ---
 
 <div align="center">
 
-リポジトリの運用とドキュメントの枠組みは [LPFchan/repo-template](https://github.com/LPFchan/repo-template) を参考にしています。<br>
-テンプレートを公開してくださり、本当にありがとうございます。
+リポジトリの運用とドキュメント構成は [LPFchan/repo-template](https://github.com/LPFchan/repo-template) を参考にしています。<br>
+テンプレートを公開してくださり、ありがとうございます。
 
 </div>

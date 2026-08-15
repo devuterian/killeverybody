@@ -80,3 +80,12 @@ Implement the accepted behavior on top of GitHub main without running a destruct
 - Output: app bundle reported 3.0.0/18; moderate and aggressive dry-runs sent no signals; Beeper was absent from moderate and present in aggressive; the isolated agent unloaded and stayed gone; appcast inferred version 18, short version 3.0.0, and the v3.0.0 GitHub asset URL
 - Blockers: Computer Use could not re-inspect the final 3.0.0 window after the Mac locked; the same UI code was inspected immediately before the version-only change, and the final app launched without `sfltool`
 - Next: commit, push, merge through CI, tag v3.0.0, and verify the public GitHub Release assets and appcast
+
+## Entry 2026-08-15 22-43-14 KST
+
+- Action: rewrote the Korean, English, and Japanese README files to match the released 3.0.0 behavior and the actual Korean UI labels.
+- Files touched: `README.md`, `README.en.md`, `README.ja.md`, current worklog
+- Checks run: source/spec comparison, three-language section and code-fence parity, local-link existence, `git diff --check`
+- Output: documented the two kill modes, no-confirmation warning, searchable saved exemptions, first-run login-app seed without an administrator prompt, session LaunchAgent suppression, graceful self-termination, Sparkle updates, CLI dry-run safety, supported macOS version, build command, and current limitations
+- Blockers: none
+- Next: publish the documentation-only change through pull request checks
