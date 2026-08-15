@@ -33,19 +33,19 @@ final class KillModalFlow: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
 
         let alert = NSAlert()
-        alert.messageText = "다 죽일까요?"
+        alert.messageText = settings.text(.mainPrompt)
         alert.informativeText = ""
         alert.alertStyle = .warning
         alert.icon = NSApp.applicationIconImage
         
-        let killAllBtn = alert.addButton(withTitle: "다죽이기")
+        let killAllBtn = alert.addButton(withTitle: settings.text(.killEverybody))
         killAllBtn.hasDestructiveAction = true
         
-        alert.addButton(withTitle: "적당히 죽이기")
+        alert.addButton(withTitle: settings.text(.spareSome))
         
-        let cancelBtn = alert.addButton(withTitle: "종료")
+        let cancelBtn = alert.addButton(withTitle: settings.text(.quit))
         cancelBtn.keyEquivalent = "\u{1b}" // ESC 키를 종료에 할당
-        alert.addButton(withTitle: "예외 앱…")
+        alert.addButton(withTitle: settings.text(.manageExceptions))
 
         let response = alert.runModal()
         switch response {
@@ -117,12 +117,18 @@ final class KillModalFlow: NSObject, NSWindowDelegate {
         let details = [processMessage, agentMessage].filter { !$0.isEmpty }.joined(separator: "\n")
 
         let alert = NSAlert()
-        alert.messageText = "일부 앱이 남았어요"
-        alert.informativeText = "\(summary.successCount)개 성공, \(summary.failureDetails.count)개 종료 실패, \(summary.agentFailureDetails.count)개 자동 실행 해제 실패.\n\(details)"
+        alert.messageText = settings.text(.someAppsRemain)
+        alert.informativeText = settings.format(
+            .killResult,
+            summary.successCount,
+            summary.failureDetails.count,
+            summary.agentFailureDetails.count,
+            details
+        )
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "확인")
+        alert.addButton(withTitle: settings.text(.ok))
         if summary.needsAdminRetry {
-            let retry = alert.addButton(withTitle: "관리자 권한으로 재시도")
+            let retry = alert.addButton(withTitle: settings.text(.retryAsAdmin))
             retry.hasDestructiveAction = true
         }
 
@@ -154,21 +160,26 @@ final class KillModalFlow: NSObject, NSWindowDelegate {
 
         let alert = NSAlert()
         if let error {
-            alert.messageText = "관리자 재시도 실패"
-            alert.informativeText = error.localizedDescription
+            alert.messageText = settings.text(.adminRetryFailed)
+            if let killError = error as? KillError, case .scriptCreationFailed = killError {
+                alert.informativeText = settings.text(.appleScriptCreationFailed)
+            } else {
+                alert.informativeText = error.localizedDescription
+            }
             alert.alertStyle = .warning
         } else {
-            alert.messageText = "관리자 권한으로 다시 보냈어요"
-            alert.informativeText = "\(retriedCount)개 프로세스에 추가 종료 요청을 보냈습니다."
+            alert.messageText = settings.text(.adminRetrySent)
+            alert.informativeText = settings.format(.adminRetryDetail, retriedCount)
             alert.alertStyle = .informational
         }
-        alert.addButton(withTitle: "확인")
+        alert.addButton(withTitle: settings.text(.ok))
         _ = alert.runModal()
         NSApp.terminate(nil)
     }
 
     private func showSettingsWindow() {
         if let settingsWindow {
+            settingsWindow.title = "killeverybody"
             settingsWindow.makeKeyAndOrderFront(nil)
             return
         }
@@ -178,7 +189,7 @@ final class KillModalFlow: NSObject, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "예외 앱"
+        window.title = "killeverybody"
         window.minSize = NSSize(width: 560, height: 460)
         window.contentView = NSHostingView(
             rootView: SettingsRootView().environmentObject(settings)

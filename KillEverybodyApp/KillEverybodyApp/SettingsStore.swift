@@ -5,6 +5,16 @@ final class SettingsStore: ObservableObject {
     private let exemptKey = "exemptBundleIDs"
     private let menubarKey = "menubarStyleBundleIDs"
     private let didSeedLoginItemsKey = "didSeedLoginItems"
+    private let languageKey = "appLanguage"
+    private let sortOrderKey = "appListSortOrder"
+
+    @Published var appLanguage: AppLanguage {
+        didSet { UserDefaults.standard.set(appLanguage.rawValue, forKey: languageKey) }
+    }
+
+    @Published var appListSortOrder: AppListSortOrder {
+        didSet { UserDefaults.standard.set(appListSortOrder.rawValue, forKey: sortOrderKey) }
+    }
 
     @Published var exemptBundleIDs: [String] {
         didSet { save() }
@@ -18,6 +28,8 @@ final class SettingsStore: ObservableObject {
 
     init() {
         let d = UserDefaults.standard
+        appLanguage = AppLanguage(rawValue: d.string(forKey: languageKey) ?? "") ?? .korean
+        appListSortOrder = AppListSortOrder(rawValue: d.string(forKey: sortOrderKey) ?? "") ?? .protectedFirst
         var exempt = d.stringArray(forKey: exemptKey) ?? []
         let loginURLs = LoginItemProvider.applicationURLs()
         let loginIDs = loginURLs.map(LoginItemProvider.bundleIDs) ?? []
@@ -33,6 +45,14 @@ final class SettingsStore: ObservableObject {
         } else {
             menubarStyleBundleIDs = []
         }
+    }
+
+    func text(_ key: AppText) -> String {
+        appLanguage.text(key)
+    }
+
+    func format(_ key: AppText, _ arguments: CVarArg...) -> String {
+        appLanguage.format(key, arguments: arguments)
     }
 
     /// 종료에서 제외할 번들 ID (예외 + 사용자 지정 메뉴바 취급 + 내장 프리셋).

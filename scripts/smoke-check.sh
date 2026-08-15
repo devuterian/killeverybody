@@ -20,6 +20,7 @@ xcrun swiftc -typecheck \
   -target arm64-apple-macosx13.0 \
   KillModalFlow.swift \
   ContentView.swift \
+  Localization.swift \
   ApplicationCatalog.swift \
   SettingsStore.swift \
   DenyList.swift \

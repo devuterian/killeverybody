@@ -4,14 +4,14 @@
 
 - **Last updated:** 2026-08-15
 - **Overall posture:** `active`
-- **Current focus:** 3.0.0 릴리스 검증·배포
+- **Current focus:** 3.0.0 이후 예외 목록 UX·앱 현지화
 - **Highest-priority blocker:** 없음(로컬에서 Xcode 전체 설치·서명은 운영자 환경에 따름)
 - **Next operator decision needed:** (선택) 서명·노타라이즈 재개 시점·denylist 가져오기 필요 여부. Sparkle EdDSA secret은 GitHub에 설정돼 있다.
 - **Related decisions:** `DEC-20260815-001`
 
 ## Current State Summary
 
-`KillEverybodyApp/`의 현재 제품 버전은 **3.0.0(빌드 18)**이다. 종료 후보는 실행 중인 앱과 자식 프로세스로 제한하며, 앱 단위 예외·LSUIElement·메뉴바 프리셋·세션 LaunchAgent 억제를 제공한다. 예외 앱 화면은 설치 앱 아이콘·검색·필터·자동 저장을 지원하고, 권한 창 없는 읽기 전용 API로 로그인 앱을 찾아 첫 실행 기본값으로 쓴다. 정책 JSON, CLI dry-run, Releases 링크와 Sparkle 자동 확인·설치도 유지한다.
+`KillEverybodyApp/`의 현재 제품 버전은 **3.0.0(빌드 18)**이다. 종료 후보는 실행 중인 앱과 자식 프로세스로 제한하며, 앱 단위 예외·LSUIElement·메뉴바 프리셋·세션 LaunchAgent 억제를 제공한다. 예외 앱 화면은 설치 앱 아이콘·검색·필터·자동 저장·3가지 정렬·단일 앱 우클릭 강제 종료를 지원한다. 한국어·English·日本語를 앱 안에서 직접 고를 수 있고, 권한 창 없는 읽기 전용 API로 로그인 앱을 찾아 첫 실행 기본값으로 쓴다. 정책 JSON, CLI dry-run, Releases 링크와 Sparkle 자동 확인·설치도 유지한다.
 
 ## Active Phases Or Tracks
 
@@ -38,6 +38,11 @@
 - **Related ids:** —
 
 ## Recent Changes To Project Reality
+
+- **2026-08-15**
+  - **Change:** 예외 앱 목록에 저장되는 3가지 정렬과 단일 앱 우클릭 강제 종료를 추가하고, 앱 전체 UI를 한국어·영어·일본어로 즉시 전환할 수 있게 함.
+  - **Why it matters:** 보호 상태를 빠르게 훑고 특정 앱만 정리할 수 있으며, 시스템 언어와 무관하게 원하는 UI 언어를 쓸 수 있음.
+  - **Related ids:** `LOG-20260815-001`
 
 - **2026-08-15**
   - **Change:** 관리자 암호를 요구하던 `sfltool` 로그인 앱 조회를 제거하고, Sparkle 2.9.5·시작 시 백그라운드 확인·자동 설치·공식 appcast 생성으로 갱신.

@@ -22,6 +22,7 @@
 		A1B2C3D41E2F304152637514 /* KillModalFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637525 /* KillModalFlow.swift */; };
 		A1B2C3D41E2F304152637515 /* ApplicationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637527 /* ApplicationCatalog.swift */; };
 		A1B2C3D41E2F304152637516 /* LaunchAgentSuppressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637528 /* LaunchAgentSuppressor.swift */; };
+		A1B2C3D41E2F304152637517 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637529 /* Localization.swift */; };
 		B2C3D4E51F304152637601 /* DenyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637494 /* DenyList.swift */; };
 		B2C3D4E51F304152637602 /* PlistHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637495 /* PlistHelpers.swift */; };
 		B2C3D4E51F304152637603 /* ProcessEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D41E2F304152637496 /* ProcessEnumerator.swift */; };
@@ -50,6 +51,7 @@
 		A1B2C3D41E2F304152637525 /* KillModalFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillModalFlow.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637527 /* ApplicationCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationCatalog.swift; sourceTree = "<group>"; };
 		A1B2C3D41E2F304152637528 /* LaunchAgentSuppressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAgentSuppressor.swift; sourceTree = "<group>"; };
+		A1B2C3D41E2F304152637529 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		B2C3D4E51F304152637551 /* KillEverybodyCLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KillEverybodyCLI.swift; sourceTree = "<group>"; };
 		B2C3D4E51F304152637590 /* killeverybody-cli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "killeverybody-cli"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -120,6 +122,7 @@
 				A1B2C3D41E2F304152637525 /* KillModalFlow.swift */,
 				A1B2C3D41E2F304152637527 /* ApplicationCatalog.swift */,
 				A1B2C3D41E2F304152637528 /* LaunchAgentSuppressor.swift */,
+				A1B2C3D41E2F304152637529 /* Localization.swift */,
 				A1B2C3D41E2F304152637498 /* Assets.xcassets */,
 				A1B2C3D41E2F304152637526 /* Info.plist */,
 				A1B2C3D41E2F304152637499 /* KillEverybodyApp.entitlements */,
@@ -250,6 +253,7 @@
 				A1B2C3D41E2F304152637514 /* KillModalFlow.swift in Sources */,
 				A1B2C3D41E2F304152637515 /* ApplicationCatalog.swift in Sources */,
 				A1B2C3D41E2F304152637516 /* LaunchAgentSuppressor.swift in Sources */,
+				A1B2C3D41E2F304152637517 /* Localization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

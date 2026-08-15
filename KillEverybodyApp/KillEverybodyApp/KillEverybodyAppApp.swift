@@ -6,6 +6,7 @@ private let releasesURLString = "https://github.com/devuterian/killeverybody/rel
 @main
 struct KillEverybodyAppApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @ObservedObject private var settings = KillEverybodySession.settings
 
     var body: some Scene {
         // macOS 13 이상에서 Settings 씬이 기본적으로 열리는 것을 방지하기 위해 사용
@@ -17,10 +18,10 @@ struct KillEverybodyAppApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(after: .appInfo) {
-                Button("업데이트 확인…") {
+                Button(settings.text(.checkForUpdates)) {
                     appDelegate.checkForUpdates()
                 }
-                Button("최신 릴리즈 열기…") {
+                Button(settings.text(.openLatestRelease)) {
                     if let url = URL(string: releasesURLString) {
                         NSWorkspace.shared.open(url)
                     }

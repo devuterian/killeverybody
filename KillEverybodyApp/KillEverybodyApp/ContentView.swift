@@ -3,12 +3,14 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct SettingsRootView: View {
+    @EnvironmentObject private var settings: SettingsStore
+
     var body: some View {
         TabView {
             ExceptionAppsView()
-                .tabItem { Label("예외 앱", systemImage: "checklist") }
+                .tabItem { Label(settings.text(.exceptionsTab), systemImage: "checklist") }
             AdvancedSettingsView()
-                .tabItem { Label("고급", systemImage: "gearshape") }
+                .tabItem { Label(settings.text(.advancedTab), systemImage: "gearshape") }
         }
         .padding(20)
         .frame(minWidth: 560, minHeight: 460)
@@ -16,11 +18,19 @@ struct SettingsRootView: View {
 }
 
 private enum AppListFilter: String, CaseIterable, Identifiable {
-    case all = "전체 앱"
-    case running = "실행 중"
-    case loginItems = "로그인 시 실행"
+    case all
+    case running
+    case loginItems
 
     var id: String { rawValue }
+
+    var titleKey: AppText {
+        switch self {
+        case .all: return .allApps
+        case .running: return .running
+        case .loginItems: return .loginItems
+        }
+    }
 }
 
 private struct ExceptionAppsView: View {
@@ -29,9 +39,10 @@ private struct ExceptionAppsView: View {
     @State private var searchText = ""
     @State private var filter = AppListFilter.all
     @State private var isLoading = true
+    @State private var terminatingBundleIDs: Set<String> = []
 
     private var filteredApplications: [ApplicationInfo] {
-        applications.filter { app in
+        let filtered = applications.filter { app in
             let matchesFilter: Bool
             switch filter {
             case .all: matchesFilter = true
@@ -45,21 +56,43 @@ private struct ExceptionAppsView: View {
                 || app.bundleID.localizedCaseInsensitiveContains(query)
                 || app.url.path.localizedCaseInsensitiveContains(query)
         }
+        return filtered.sorted(by: comesBefore)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("적당히 죽이기에서 살아남을 앱")
+            HStack(alignment: .top) {
+                Text(settings.text(.appsToSpare))
                     .font(.title2.weight(.semibold))
                 Spacer()
-                Text("\(settings.exemptBundleIDs.count)개 보호 중")
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .trailing, spacing: 3) {
+                    Text(settings.format(.protectedCount, settings.exemptBundleIDs.count))
+                        .foregroundStyle(.secondary)
+                    Menu {
+                        ForEach(AppListSortOrder.allCases) { order in
+                            Toggle(
+                                settings.text(order.titleKey),
+                                isOn: Binding(
+                                    get: { settings.appListSortOrder == order },
+                                    set: { selected in
+                                        if selected { settings.appListSortOrder = order }
+                                    }
+                                )
+                            )
+                        }
+                    } label: {
+                        Label(settings.text(.sort), systemImage: "arrow.up.arrow.down.circle")
+                            .labelStyle(.iconOnly)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .fixedSize()
+                    .help(settings.text(.sort))
+                }
             }
 
-            Picker("목록", selection: $filter) {
+            Picker(settings.text(.allApps), selection: $filter) {
                 ForEach(AppListFilter.allCases) { item in
-                    Text(item.rawValue).tag(item)
+                    Text(settings.text(item.titleKey)).tag(item)
                 }
             }
             .pickerStyle(.segmented)
@@ -69,7 +102,7 @@ private struct ExceptionAppsView: View {
                 if isLoading {
                     VStack(spacing: 10) {
                         ProgressView()
-                        Text("앱 목록을 불러오는 중…")
+                        Text(settings.text(.loadingApps))
                             .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -78,9 +111,9 @@ private struct ExceptionAppsView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 28))
                             .foregroundStyle(.secondary)
-                        Text(searchText.isEmpty ? "앱이 없어요" : "검색 결과가 없어요")
+                        Text(settings.text(searchText.isEmpty ? .noApps : .noSearchResults))
                             .font(.headline)
-                        Text(searchText.isEmpty ? "다른 목록을 선택해 보세요." : "앱 이름, 번들 ID, 경로로 다시 찾아보세요.")
+                        Text(settings.text(searchText.isEmpty ? .chooseAnotherList : .tryAnotherSearch))
                             .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -105,12 +138,20 @@ private struct ExceptionAppsView: View {
                                 }
                                 Spacer()
                                 if app.isLoginItem {
-                                    Label("로그인", systemImage: "power")
+                                    Label(settings.text(.loginBadge), systemImage: "power")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
-                                if app.isRunning {
-                                    Text("실행 중")
+                                if terminatingBundleIDs.contains(app.bundleID) {
+                                    HStack(spacing: 5) {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                        Text(settings.text(.quitting))
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                } else if app.isRunning {
+                                    Text(settings.text(.running))
                                         .font(.caption)
                                         .foregroundStyle(.green)
                                 }
@@ -119,23 +160,88 @@ private struct ExceptionAppsView: View {
                             .help(app.url.path)
                         }
                         .toggleStyle(.checkbox)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                forceQuit(app)
+                            } label: {
+                                Label(settings.text(.forceQuitThisApp), systemImage: "xmark.octagon")
+                            }
+                            .disabled(
+                                !app.isRunning
+                                    || app.bundleID == Bundle.main.bundleIdentifier
+                                    || terminatingBundleIDs.contains(app.bundleID)
+                            )
+                        }
                     }
                     .listStyle(.inset)
                 }
             }
-            .searchable(text: $searchText, placement: .toolbar, prompt: "앱 이름, 번들 ID, 경로")
+            .searchable(text: $searchText, placement: .toolbar, prompt: settings.text(.searchPrompt))
         }
-        .task { loadApplications() }
+        .task { refreshApplications(showLoading: true) }
     }
 
-    private func loadApplications() {
-        guard isLoading else { return }
+    private func comesBefore(_ lhs: ApplicationInfo, _ rhs: ApplicationInfo) -> Bool {
+        let lhsProtected = settings.isExempt(lhs.bundleID)
+        let rhsProtected = settings.isExempt(rhs.bundleID)
+        switch settings.appListSortOrder {
+        case .protectedFirst where lhsProtected != rhsProtected:
+            return lhsProtected
+        case .unprotectedFirst where lhsProtected != rhsProtected:
+            return !lhsProtected
+        default:
+            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+        }
+    }
+
+    private func refreshApplications(showLoading: Bool = false) {
+        if showLoading { isLoading = true }
         let loginIDs = settings.loginItemBundleIDs
         DispatchQueue.global(qos: .userInitiated).async {
             let loaded = ApplicationCatalog.load(loginItemBundleIDs: loginIDs)
             DispatchQueue.main.async {
                 applications = loaded
                 isLoading = false
+            }
+        }
+    }
+
+    private func forceQuit(_ app: ApplicationInfo) {
+        guard app.isRunning, terminatingBundleIDs.insert(app.bundleID).inserted else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let candidates = ProcessEnumerator.collectApplicationKillCandidates(bundleID: app.bundleID)
+            let agentFailures = LaunchAgentSuppressor.bootout(bundleIDs: [app.bundleID])
+            let failures = KillExecutor.killLocally(pids: candidates.map(\.pid))
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                terminatingBundleIDs.remove(app.bundleID)
+                guard !failures.isEmpty || !agentFailures.isEmpty else {
+                    applications = applications.map { item in
+                        guard item.bundleID == app.bundleID else { return item }
+                        return ApplicationInfo(
+                            bundleID: item.bundleID,
+                            name: item.name,
+                            url: item.url,
+                            isRunning: false,
+                            isLoginItem: item.isLoginItem
+                        )
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        refreshApplications()
+                    }
+                    return
+                }
+                refreshApplications()
+                let alert = NSAlert()
+                alert.messageText = settings.text(.forceQuitFailed)
+                alert.informativeText = settings.format(
+                    .forceQuitFailureDetail,
+                    app.name,
+                    failures.count,
+                    agentFailures.count
+                )
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: settings.text(.ok))
+                alert.runModal()
             }
         }
     }
@@ -148,21 +254,33 @@ private struct AdvancedSettingsView: View {
 
     var body: some View {
         Form {
-            Section("번들 ID 직접 추가") {
-                TextField("예: com.apple.Safari", text: $newExemptID)
-                Button("예외에 추가") {
+            Section(settings.text(.language)) {
+                Picker(settings.text(.language), selection: $settings.appLanguage) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Text(settings.text(.languageHint))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section(settings.text(.addBundleID)) {
+                TextField(settings.text(.bundleIDExample), text: $newExemptID)
+                Button(settings.text(.addToExceptions)) {
                     settings.addExempt(newExemptID)
                     newExemptID = ""
                 }
                 .disabled(newExemptID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
 
-            Section("메뉴 막대로 취급할 번들") {
-                Text("LSUIElement가 아니어도 메뉴 막대 앱처럼 보호하고 싶을 때 사용해요.")
+            Section(settings.text(.menubarBundles)) {
+                Text(settings.text(.menubarHint))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                TextField("번들 ID", text: $newMenubarID)
-                Button("추가") {
+                TextField(settings.text(.bundleID), text: $newMenubarID)
+                Button(settings.text(.add)) {
                     settings.addMenubarStyle(newMenubarID)
                     newMenubarID = ""
                 }
@@ -178,10 +296,10 @@ private struct AdvancedSettingsView: View {
                 }
             }
 
-            Section("정책 파일") {
+            Section(settings.text(.policyFile)) {
                 HStack {
-                    Button("정책 보내기…", action: exportPolicyFile)
-                    Button("정책 가져오기…", action: importPolicyFile)
+                    Button(settings.text(.exportPolicy), action: exportPolicyFile)
+                    Button(settings.text(.importPolicy), action: importPolicyFile)
                 }
             }
         }
@@ -193,7 +311,7 @@ private struct AdvancedSettingsView: View {
         alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "확인")
+        alert.addButton(withTitle: settings.text(.ok))
         alert.runModal()
     }
 
@@ -207,13 +325,13 @@ private struct AdvancedSettingsView: View {
                 guard response == .OK, let url = panel.url else { return }
                 do {
                     try data.write(to: url, options: .atomic)
-                    showPolicyAlert(title: "저장했어요", message: url.path)
+                    showPolicyAlert(title: settings.text(.saved), message: url.path)
                 } catch {
-                    showPolicyAlert(title: "저장 실패", message: error.localizedDescription)
+                    showPolicyAlert(title: settings.text(.saveFailed), message: error.localizedDescription)
                 }
             }
         } catch {
-            showPolicyAlert(title: "보내기 실패", message: error.localizedDescription)
+            showPolicyAlert(title: settings.text(.exportFailed), message: error.localizedDescription)
         }
     }
 
@@ -228,20 +346,20 @@ private struct AdvancedSettingsView: View {
                 let data = try Data(contentsOf: url)
                 let doc = try PolicyDocument.decodeDocument(from: data)
                 guard doc.formatVersion <= PolicyDocument.currentFormatVersion else {
-                    showPolicyAlert(title: "버전이 더 새 파일이에요", message: "앱을 업데이트한 뒤 다시 시도해 주세요.")
+                    showPolicyAlert(title: settings.text(.newerPolicy), message: settings.text(.updateThenRetry))
                     return
                 }
                 let confirm = NSAlert()
-                confirm.messageText = "정책을 덮어쓸까요?"
-                confirm.informativeText = "지금 목록이 JSON 파일 내용으로 바뀝니다."
+                confirm.messageText = settings.text(.overwritePolicy)
+                confirm.informativeText = settings.text(.overwritePolicyDetail)
                 confirm.alertStyle = .warning
-                confirm.addButton(withTitle: "취소")
-                confirm.addButton(withTitle: "덮어쓰기")
+                confirm.addButton(withTitle: settings.text(.cancel))
+                confirm.addButton(withTitle: settings.text(.overwrite))
                 if confirm.runModal() == .alertSecondButtonReturn {
                     settings.applyImportedPolicy(doc)
                 }
             } catch {
-                showPolicyAlert(title: "읽기 실패", message: error.localizedDescription)
+                showPolicyAlert(title: settings.text(.readFailed), message: error.localizedDescription)
             }
         }
     }

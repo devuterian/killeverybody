@@ -6,7 +6,7 @@
 - **Canonical repo:** [github.com/devuterian/killeverybody](https://github.com/devuterian/killeverybody)
 - **Project id:** `killeverybody`
 - **Primary surface:** macOS SwiftUI 앱 — [`KillEverybodyApp/`](KillEverybodyApp/)
-- **Last updated:** 2026-08-15 (권한 없는 로그인 앱 조회·Sparkle 자동 업데이트)
+- **Last updated:** 2026-08-15 (예외 목록 정렬·단일 앱 강제 종료·3개 언어 설정)
 
 ## Project thesis
 
@@ -14,10 +14,12 @@
 
 ## Core capabilities
 
-- 메인 창: 시스템 `NSAlert`에 앱 아이콘·질문 **「다 죽일까요?」**와 **다죽이기 / 적당히 죽이기 / 예외 앱… / 종료** 버튼을 둔다. 종료 버튼은 추가 확인 없이 바로 실행한다.
+- 메인 창: 시스템 `NSAlert`에 앱 아이콘과 종료 모드·예외 설정·종료 버튼을 둔다. 한국어 **「다 죽일까요?」**, 영어 **“Kill everybody?”**, 일본어 **「みんな殺す？」**를 사용하며 종료 버튼은 추가 확인 없이 바로 실행한다.
 - **다죽이기:** 실행 중인 앱과 자식 프로세스 중 고정 denylist와 killeverybody 자신만 제외한다. 사용자 예외·메뉴바 프리셋·LSUIElement 보호는 적용하지 않는다.
 - **적당히 죽이기:** 같은 앱 중심 범위에서 사용자 예외 번들 ID + 메뉴 막대 취급 번들 + 프리셋 + LSUIElement를 제외한다.
-- **예외 앱:** 설치 앱을 아이콘·이름·번들 ID로 보여 주고 전체 앱·실행 중·로그인 시 실행 필터와 검색을 제공한다. 체크는 즉시 저장하며, 첫 실행 때 읽기 전용 SharedFileList에서 찾은 로그인 앱을 기본 예외로 한 번만 넣는다. 로그인 앱 조회는 관리자 암호를 요구하지 않는다.
+- **예외 앱:** 설치 앱을 아이콘·이름·번들 ID로 보여 주고 전체 앱·실행 중·로그인 시 실행 필터와 검색을 제공한다. 보호 앱 먼저·비보호 앱 먼저·이름순 정렬과 마지막 선택을 저장한다. 체크는 즉시 저장하며, 첫 실행 때 읽기 전용 SharedFileList에서 찾은 로그인 앱을 기본 예외로 한 번만 넣는다. 로그인 앱 조회는 관리자 암호를 요구하지 않는다.
+- **단일 앱 강제 종료:** 실행 중인 앱의 우클릭 메뉴에서 그 앱과 자식·헬퍼 프로세스, 일치하는 세션 LaunchAgent만 추가 확인 없이 종료한다. 예외 체크는 바꾸지 않고 성공 시 목록만 갱신하며 실패 때만 알린다.
+- **언어 설정:** 고급 탭에서 한국어·English·日本語를 직접 고른다. 선택은 저장되고 메인 경고창·설정·결과·앱 메뉴에 즉시 적용된다.
 - 앱 헬퍼는 가장 바깥쪽 앱 번들로 묶는다. 일치하는 서드파티 LaunchAgent는 현재 GUI 세션에서만 `bootout`하며 plist는 수정하지 않는다.
 - 종료가 모두 성공하면 결과 창 없이 killeverybody도 정상 종료한다. 일부 실패 때만 결과와 관리자 재시도를 보여 준 뒤 종료한다.
 - 앱 메뉴에서 **Releases** 페이지를 열고, **Sparkle**로 실행 직후와 예약 시점에 업데이트를 확인하며 가능한 업데이트는 자동으로 내려받아 설치한다(피드: `releases/latest/download/appcast.xml`). 릴리스 CI는 프로젝트가 쓰는 Sparkle 버전의 공식 `generate_appcast`로 EdDSA 서명 피드를 만든다. `Sparkle.framework`는 앱 번들 `Contents/Frameworks`에 임베드하고, 오류는 OSLog(`category: Sparkle`)에 남긴다.
@@ -27,6 +29,7 @@
 
 - 시스템 핵심 프로세스(`launchd`, `WindowServer`, `kernel_task` 등)는 denylist로 **코드에 고정**해 후보에서 제외한다.
 - 종료 버튼 뒤에 추가 확인 단계나 테이블 미리보기를 넣지 않는다.
+- 단일 앱 우클릭 강제 종료도 메뉴 선택 뒤에 추가 확인을 넣지 않는다.
 - **적당히 죽이기**에서 메뉴바 판별은 **공개 API 휴리스틱**(LSUIElement + 사용자 예외·메뉴바 취급 + 프리셋)이며 완벽하지 않다는 점을 사용자 문서에 명시한다.
 
 ## Non-goals

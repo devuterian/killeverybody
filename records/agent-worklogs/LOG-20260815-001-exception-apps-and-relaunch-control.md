@@ -89,3 +89,21 @@ Implement the accepted behavior on top of GitHub main without running a destruct
 - Output: documented the two kill modes, no-confirmation warning, searchable saved exemptions, first-run login-app seed without an administrator prompt, session LaunchAgent suppression, graceful self-termination, Sparkle updates, CLI dry-run safety, supported macOS version, build command, and current limitations
 - Blockers: none
 - Next: publish the documentation-only change through pull request checks
+
+## Entry 2026-08-15 23-08-12 KST
+
+- Action: added remembered protection/name sorting, per-app context-menu force quit, and immediate Korean/English/Japanese UI selection; revised the sort menu after live feedback so choices open directly instead of inside a nested submenu.
+- Files touched: app UI, settings, localization, process enumeration, Xcode project, smoke check, changelog, spec, status, three README files, current worklog
+- Checks run: Swift smoke typecheck, Debug Xcode app build, live Korean/English/Japanese alert and settings inspection, direct sort menu and selection inspection, context-menu inspection
+- Output: all three language sets fit the native alert and settings layout; the sort menu opens directly with the active choice checked; right-click exposes one destructive action without changing exemption state
+- Blockers: none
+- Next: run isolated single-app termination, final builds and dry-runs, install the preview, then publish through pull request checks
+
+## Entry 2026-08-15 23-16-21 KST
+
+- Action: completed destructive-path validation in isolation and installed the verified Release app in `/Applications`.
+- Files touched: no additional product files; temporary AppleScript test apps were removed after verification
+- Checks run: Debug and Release app builds, Release CLI build, moderate/aggressive CLI dry-runs, execute-without-yes refusal, localization key-count parity, Impeccable detector, two isolated context-menu force quits including an app with a live child process, installed-bundle ad-hoc codesign verification
+- Output: direct sort choices and all three languages persisted; isolated parent and child PIDs both stopped while killeverybody stayed open; `/Applications/killeverybody.app` reports 3.0.0 build 18 and opens in Korean with the new labels
+- Blockers: Xcode reports an unrelated stale iOS CoreSimulator warning while both macOS targets build successfully; SharedFileList deprecation warnings remain the intentional no-password compatibility path
+- Next: review the final diff, commit, publish through CI, and merge
