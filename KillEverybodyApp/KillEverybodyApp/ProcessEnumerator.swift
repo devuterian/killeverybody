@@ -75,11 +75,76 @@ enum ProcessEnumerator {
         protectedBundleIDs: Set<String>,
         excludingPID: pid_t = getpid()
     ) -> [KillCandidate] {
-        collectUserProcesses(
+        collectApplicationProcesses(
             protectedBundleIDs: protectedBundleIDs,
             respectUserAndAgentProtection: !aggressive,
             excludingPID: excludingPID
         )
+    }
+
+    /// 실행 중인 앱을 루트로 삼아 그 자식 프로세스까지 모은다.
+    /// 같은 UID라는 이유만으로 시스템 에이전트나 셸 전체를 대상으로 삼지는 않는다.
+    private static func collectApplicationProcesses(
+        protectedBundleIDs: Set<String>,
+        respectUserAndAgentProtection: Bool,
+        excludingPID: pid_t
+    ) -> [KillCandidate] {
+        let uid = getuid()
+        let rows = parsePS().filter { $0.uid == uid }
+        let rowsByPID = Dictionary(uniqueKeysWithValues: rows.map { ($0.pid, $0) })
+        let childrenByParent = Dictionary(grouping: rows, by: \.ppid)
+        var candidatesByPID: [pid_t: KillCandidate] = [:]
+
+        for app in NSWorkspace.shared.runningApplications {
+            let seedPID = app.processIdentifier
+            guard seedPID != excludingPID,
+                  !app.isTerminated,
+                  app.activationPolicy != .prohibited
+            else { continue }
+            if let ownBundleID, app.bundleIdentifier == ownBundleID { continue }
+
+            let executablePath = app.executableURL?.path ?? ProcPath.path(for: seedPID)
+            let appRoot = executablePath.flatMap(PlistHelpers.topLevelApplicationRoot)
+                ?? app.bundleURL
+            let ownerBundleID = appRoot.flatMap(PlistHelpers.bundleIdentifier)
+                ?? app.bundleIdentifier
+            let name = appRoot.map { FileManager.default.displayName(atPath: $0.path) }
+                ?? app.localizedName
+                ?? "pid \(seedPID)"
+
+            if let executablePath {
+                let comm = URL(fileURLWithPath: executablePath).lastPathComponent
+                if DenyList.isDenied(comm: comm, path: executablePath) { continue }
+            }
+
+            if respectUserAndAgentProtection {
+                if let ownerBundleID, protectedBundleIDs.contains(ownerBundleID) { continue }
+                if let bundleID = app.bundleIdentifier, protectedBundleIDs.contains(bundleID) { continue }
+                if let appRoot, PlistHelpers.isLSUIElement(bundleURL: appRoot) { continue }
+                if let bundleURL = app.bundleURL, PlistHelpers.isLSUIElement(bundleURL: bundleURL) { continue }
+            }
+
+            var pending = [seedPID]
+            var seen: Set<pid_t> = []
+            while let pid = pending.popLast() {
+                guard seen.insert(pid).inserted, pid != excludingPID else { continue }
+                pending.append(contentsOf: childrenByParent[pid, default: []].map(\.pid))
+                guard let row = rowsByPID[pid] else { continue }
+
+                let path = ProcPath.path(for: pid)
+                let comm = path.map { URL(fileURLWithPath: $0).lastPathComponent } ?? row.comm
+                if DenyList.isDenied(comm: comm, path: path) { continue }
+                candidatesByPID[pid] = KillCandidate(
+                    id: pid,
+                    name: pid == seedPID ? name : comm,
+                    path: path,
+                    bundleID: ownerBundleID,
+                    reason: "앱 \(name)"
+                )
+            }
+        }
+
+        return candidatesByPID.values.sorted { $0.pid < $1.pid }
     }
 
     private static func collectGUI(protectedBundleIDs: Set<String>, excludingPID: pid_t) -> [KillCandidate] {
@@ -191,6 +256,7 @@ enum ProcessEnumerator {
 
     private struct PSRow {
         let pid: pid_t
+        let ppid: pid_t
         let uid: uid_t
         let comm: String
     }
@@ -198,7 +264,7 @@ enum ProcessEnumerator {
     private static func parsePS() -> [PSRow] {
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/bin/ps")
-        p.arguments = ["-axo", "pid=,uid=,comm="]
+        p.arguments = ["-axo", "pid=,ppid=,uid=,comm="]
         let pipe = Pipe()
         p.standardOutput = pipe
         p.standardError = Pipe()
@@ -217,13 +283,14 @@ enum ProcessEnumerator {
         for line in s.split(whereSeparator: \.isNewline) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             if trimmed.isEmpty { continue }
-            let parts = trimmed.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
-            guard parts.count >= 3,
+            let parts = trimmed.split(separator: " ", maxSplits: 3, omittingEmptySubsequences: true)
+            guard parts.count >= 4,
                   let pid = Int32(parts[0]),
-                  let u = UInt32(parts[1])
+                  let ppid = Int32(parts[1]),
+                  let u = UInt32(parts[2])
             else { continue }
-            let comm = String(parts[2])
-            rows.append(PSRow(pid: pid, uid: uid_t(u), comm: comm))
+            let comm = String(parts[3])
+            rows.append(PSRow(pid: pid, ppid: ppid, uid: uid_t(u), comm: comm))
         }
         return rows
     }

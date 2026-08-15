@@ -15,6 +15,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: 태그와 앱 버전 확인
+        run: |
+          set -euo pipefail
+          PBX="${GITHUB_WORKSPACE}/KillEverybodyApp/KillEverybodyApp.xcodeproj/project.pbxproj"
+          APP_VERSION=$(grep -m1 'MARKETING_VERSION = ' "${PBX}" | sed 's/.*MARKETING_VERSION = \(.*\);/\1/' | tr -d ' ')
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "${APP_VERSION}" != "${TAG_VERSION}" ]; then
+            echo "::error::태그 ${GITHUB_REF_NAME}와 앱 버전 ${APP_VERSION}이 다릅니다."
+            exit 1
+          fi
+
       - name: Build app + CLI (Release, unsigned)
         run: |
           set -euo pipefail
@@ -88,48 +99,42 @@ jobs:
             echo "::error::GitHub 저장소 secret \`SPARKLE_PRIVATE_KEY\`가 없습니다. CONTRIBUTING.md(Sparkle)를 참고하세요."
             exit 1
           fi
-          SPARKLE_DIR="${RUNNER_TEMP}/sparkle"
-          mkdir -p "${SPARKLE_DIR}"
-          curl -sL -o "${SPARKLE_DIR}/sparkle.tar.xz" \
-            "https://github.com/sparkle-project/Sparkle/releases/download/2.9.1/Sparkle-2.9.1.tar.xz"
-          tar -xJf "${SPARKLE_DIR}/sparkle.tar.xz" -C "${SPARKLE_DIR}" ./bin/sign_update
-          chmod +x "${SPARKLE_DIR}/bin/sign_update"
-          DMG="${GITHUB_WORKSPACE}/KillEverybody-macOS.dmg"
-          FRAG=$(printf '%s\n' "${SPARKLE_PRIVATE_KEY}" | "${SPARKLE_DIR}/bin/sign_update" --ed-key-file - "${DMG}" 2>&1)
-          echo "sign_update: ${FRAG}"
-          SIG=$(printf '%s' "${FRAG}" | grep -o 'edSignature="[^"]*"' | head -1 | cut -d'"' -f2)
-          LEN=$(printf '%s' "${FRAG}" | grep -o 'length="[0-9]*"' | head -1 | cut -d'"' -f2)
-          if [ -z "${SIG}" ] || [ -z "${LEN}" ]; then
-            echo "::error::sign_update 출력에서 서명 또는 length를 파싱하지 못했습니다."
+          RESOLVED="${GITHUB_WORKSPACE}/KillEverybodyApp/KillEverybodyApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          SPARKLE_VERSION=$(jq -r '.pins[] | select(.identity == "sparkle") | .state.version' "${RESOLVED}")
+          if [ -z "${SPARKLE_VERSION}" ] || [ "${SPARKLE_VERSION}" = "null" ]; then
+            echo "::error::Package.resolved에서 Sparkle 버전을 찾지 못했습니다."
             exit 1
           fi
-          PBX="${GITHUB_WORKSPACE}/KillEverybodyApp/KillEverybodyApp.xcodeproj/project.pbxproj"
-          SHORT=$(grep -m1 'MARKETING_VERSION = ' "${PBX}" | sed 's/.*MARKETING_VERSION = \(.*\);/\1/' | tr -d ' ')
-          BUILD=$(grep -m1 'CURRENT_PROJECT_VERSION = ' "${PBX}" | sed 's/.*CURRENT_PROJECT_VERSION = \(.*\);/\1/' | tr -d ' ')
+          SPARKLE_DIR="${RUNNER_TEMP}/sparkle"
+          ARCHIVES="${RUNNER_TEMP}/sparkle_archives"
+          mkdir -p "${SPARKLE_DIR}" "${ARCHIVES}"
+          curl -fsSL -o "${SPARKLE_DIR}/sparkle.tar.xz" \
+            "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz"
+          tar -xJf "${SPARKLE_DIR}/sparkle.tar.xz" -C "${SPARKLE_DIR}" ./bin/generate_appcast
+          chmod +x "${SPARKLE_DIR}/bin/generate_appcast"
+          DMG="${GITHUB_WORKSPACE}/KillEverybody-macOS.dmg"
+          cp "${DMG}" "${ARCHIVES}/"
           TAG="${GITHUB_REF_NAME}"
-          DMG_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/KillEverybody-macOS.dmg"
-          PUBDATE=$(date -u +"%a, %d %b %Y %H:%M:%S +0000")
           OUT="${GITHUB_WORKSPACE}/appcast.xml"
-          cat > "${OUT}" <<EOF
-          <?xml version="1.0" encoding="utf-8"?>
-          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <channel>
-              <title>killeverybody</title>
-              <link>https://github.com/${GITHUB_REPOSITORY}</link>
-              <description>Sparkle appcast</description>
-              <language>ko</language>
-              <item>
-                <title>${SHORT}</title>
-                <pubDate>${PUBDATE}</pubDate>
-                <sparkle:version>${BUILD}</sparkle:version>
-                <sparkle:shortVersionString>${SHORT}</sparkle:shortVersionString>
-                <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-                <enclosure url="${DMG_URL}" length="${LEN}" type="application/octet-stream" sparkle:edSignature="${SIG}" />
-              </item>
-            </channel>
-          </rss>
-          EOF
-          sed -i '' 's/^[[:space:]]*//' "${OUT}"
+          APPCAST_LOG="${RUNNER_TEMP}/generate_appcast.log"
+          printf '%s\n' "${SPARKLE_PRIVATE_KEY}" | \
+            "${SPARKLE_DIR}/bin/generate_appcast" \
+              --ed-key-file - \
+              --download-url-prefix "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/" \
+              --link "https://github.com/${GITHUB_REPOSITORY}" \
+              --maximum-versions 1 \
+              --maximum-deltas 0 \
+              --disable-signing-warning \
+              -o "${OUT}" \
+              "${ARCHIVES}" 2>&1 | tee "${APPCAST_LOG}"
+          if grep -q 'does not match key EdDSA' "${APPCAST_LOG}"; then
+            echo "::error::SPARKLE_PRIVATE_KEY가 앱의 SUPublicEDKey와 맞지 않습니다."
+            exit 1
+          fi
+          xmllint --noout "${OUT}"
+          grep -q 'sparkle:edSignature=' "${OUT}"
+          grep -q 'length=' "${OUT}"
+          grep -q "releases/download/${TAG}/KillEverybody-macOS.dmg" "${OUT}"
           echo "---- appcast.xml ----"
           cat "${OUT}"
 
